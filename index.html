@@ -71,26 +71,13 @@
     input { flex-grow: 1; padding: 12px 15px; border: 1px solid #ddd; border-radius: 25px; outline: none; background: #f9f9f9; }
     .send-btn { background: var(--gold-shine); color: var(--text-dark); border: none; padding: 0 24px; border-radius: 25px; font-weight: bold; }
 
-    /* --- NAV BAR (The Fix) --- */
-    .nav-bar { 
-      background: linear-gradient(180deg, #ffc107 0%, #ffca28 100%); 
-      border-top: 3px solid #b78900; 
-      display: flex; 
-      justify-content: space-evenly; /* Evenly space the 6 buttons */
-      padding: 8px 5px; /* Reduced side padding */
-      flex-shrink: 0; 
-      z-index: 200; 
-    }
-    .nav-item { 
-      text-align: center; color: var(--text-dark); opacity: 0.6; background: none; border: none; 
-      font-size: 0.65rem; /* Slightly larger font */
-      font-weight: 700; display: flex; flex-direction: column; align-items: center; 
-      min-width: 15%; /* Ensures even spacing and fit */
-    }
+    /* --- NAV BAR (6 TABS FIX) --- */
+    .nav-bar { background: linear-gradient(180deg, #ffc107 0%, #ffca28 100%); border-top: 3px solid #b78900; display: flex; justify-content: space-evenly; padding: 8px 5px; flex-shrink: 0; z-index: 200; }
+    .nav-item { text-align: center; color: var(--text-dark); opacity: 0.6; background: none; border: none; font-size: 0.65rem; font-weight: 700; display: flex; flex-direction: column; align-items: center; min-width: 15%; }
     .nav-item.active { opacity: 1; transform: translateY(-2px); text-shadow: 0 1px 0 rgba(255,255,255,0.5); }
     .nav-item i { display: block; font-size: 1.2rem; margin-bottom: 2px; }
 
-    /* --- AGENCIES LIST --- */
+    /* --- AGENCY CATEGORIES --- */
     .category-header { font-size: 0.9rem; color: #8a6d3b; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-top: 20px; margin-bottom: 10px; border-bottom: 2px solid #ffc107; padding-bottom: 5px; }
 
     /* --- VAULT STYLES --- */
@@ -101,13 +88,9 @@
     .file-item { background: white; border-bottom: 1px solid #eee; padding: 15px 10px; display: flex; align-items: center; }
     .file-icon { font-size: 1.2rem; margin-right: 15px; color: #ffc107; }
 
-    /* --- MAP & AGENT DASHBOARD (Existing) --- */
-    .dashboard-stat { background: white; padding: 20px; border-radius: 15px; margin-bottom: 15px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-    .stat-num { font-size: 3rem; font-weight: 900; color: #ffb300; }
-    .control-row { display: flex; justify-content: center; gap: 20px; margin-top: 10px; }
-    .ctrl-btn { width: 45px; height: 45px; border-radius: 50%; border: none; font-size: 1.5rem; font-weight: bold; }
-    .btn-minus { background: white; color: var(--ruby); border: 2px solid var(--ruby); }
-    .btn-plus { background: white; color: var(--emerald); border: 2px solid var(--emerald); }
+    /* --- ACADEMY --- */
+    .flashcard-box { background: linear-gradient(135deg, #2c3e50, #4ca1af); padding: 20px; border-radius: 15px; color: white; margin-bottom: 25px; text-align: center; }
+    .fc-btn { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.5); color: white; padding: 8px 20px; border-radius: 20px; margin: 0 5px; }
 
   </style>
 </head>
@@ -342,7 +325,7 @@
       
       var lc = text.toLowerCase(); var resp = "";
       if (lc.includes("dog") || lc.includes("pet")) lastContext = "pet";
-      if (lc.includes("vet")) userProfile.isVeteran = true;
+      if (lc.includes("vet") || lc.includes("military")) userProfile.isVeteran = true;
 
       if(lc.includes("suicide")) resp = "Please call 988. I want you to be safe.";
       else if(lastContext === "pet" && lc.includes("avail")) resp = `<b>Live Update:</b> Noah's Animal House currently has <b>${bedCount} Kennels Available</b>.`;
@@ -381,10 +364,7 @@
 
     function openLesson(t, i, s) { document.getElementById('viewer-body').innerHTML = `<h3>${t}</h3><div class="intel-box">${i}</div>`; document.getElementById('lesson-viewer').style.display = 'flex'; }
     let fIdx = 0;
-    function answerFlashcard(a) { 
-      if(a==='yes') { userProfile.hasPet = true; renderWorkbooks(); } 
-      document.getElementById('flashcard-container').style.display='none'; 
-    }
+    function answerFlashcard(a) { if(a==='yes') { userProfile.hasPet = true; renderWorkbooks(); } document.getElementById('flashcard-container').style.display='none'; }
 
     // Art Studio Stubs
     function openStudio() { document.getElementById('art-studio').style.display='flex'; }
