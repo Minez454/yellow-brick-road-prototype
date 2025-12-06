@@ -71,16 +71,15 @@
     input { flex-grow: 1; padding: 12px 15px; border: 1px solid #ddd; border-radius: 25px; outline: none; background: #f9f9f9; }
     .send-btn { background: var(--gold-shine); color: var(--text-dark); border: none; padding: 0 24px; border-radius: 25px; font-weight: bold; }
 
-    /* --- NAV BAR (THE FINAL FIX) --- */
+    /* --- NAV BAR (THE FINAL FIX - MAX COMPRESSION) --- */
     .nav-bar { 
       background: linear-gradient(180deg, #ffc107 0%, #ffca28 100%); 
       border-top: 3px solid #b78900; 
       display: flex; 
-      justify-content: space-evenly; 
+      justify-content: space-between; 
       padding: 8px 5px; 
       flex-shrink: 0; 
       z-index: 200; 
-      /* Added scroll property for absolute reliability on small screens */
       overflow-x: scroll; 
       white-space: nowrap; 
     }
@@ -88,8 +87,8 @@
       text-align: center; color: var(--text-dark); opacity: 0.6; background: none; border: none; 
       font-size: 0.6rem; 
       font-weight: 700; display: flex; flex-direction: column; align-items: center; 
-      min-width: 15%; 
-      padding: 0 3px; 
+      padding: 0 1px;
+      min-width: 16%;
     }
     .nav-item.active { opacity: 1; transform: translateY(-2px); text-shadow: 0 1px 0 rgba(255,255,255,0.5); }
     .nav-item i { display: block; font-size: 1.2rem; margin-bottom: 2px; }
@@ -410,3 +409,4 @@
   </script>
 </body>
 </html>
+
