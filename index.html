@@ -87,8 +87,8 @@
       text-align: center; color: var(--text-dark); opacity: 0.6; background: none; border: none; 
       font-size: 0.65rem; 
       font-weight: 700; display: flex; flex-direction: column; align-items: center; 
-      min-width: 15%; 
       padding: 0 1px;
+      min-width: 16%;
     }
     .nav-item.active { opacity: 1; transform: translateY(-2px); text-shadow: 0 1px 0 rgba(255,255,255,0.5); }
     .nav-item i { display: block; font-size: 1.2rem; margin-bottom: 2px; }
@@ -209,7 +209,7 @@
 
     <div id="workbooks-screen" class="screen">
       <div class="content-pad">
-        <div id="flashcard-container" class="choice-container">
+        <div id="flashcard-container" class="flashcard-box">
           <div style="font-size:0.8rem; opacity:0.8;">ASSESSMENT</div>
           <div style="font-size:1.1rem; font-weight:bold; margin:15px 0;" id="fc-text">Do you have a pet?</div>
           <div><button class="fc-btn" onclick="answerFlashcard('yes')">Yes</button><button class="fc-btn" onclick="answerFlashcard('no')">No</button></div>
@@ -245,7 +245,6 @@
             <button class="ctrl-btn btn-minus" onclick="updateBeds(-1)">-</button>
             <button class="ctrl-btn btn-plus" onclick="updateBeds(1)">+</button>
           </div>
-          <p style="font-size:0.8rem; color:#886; margin-top:10px;">Updates Member Maps Instantly</p>
         </div>
       </div>
     </div>
@@ -264,9 +263,9 @@
 
   <script>
     // --- 1. GLOBAL STATE ---
-    var appMode = "member";
-    var bedCount = 3;
     var userProfile = { hasPet: false, isVeteran: false, hasLegalIssues: false, noID: false };
+    var bedCount = 3; 
+    var lastContext = ""; 
 
     // --- 2. DATA ---
     const agencies = [
@@ -292,15 +291,15 @@
       } else alert("Invalid. Check demo defaults.");
     }
     function enterApp(mode) {
-      appMode = mode; document.getElementById('main-app').style.display = 'flex';
+      document.getElementById('main-app').style.display = 'flex';
       const nav = document.getElementById('nav-bar');
+      hideAllOverlays(); // FIX: Ensure clean start
+      
       if (mode === 'agent') {
         document.getElementById('page-title').innerText = "Agent Portal"; switchTab('agent');
         nav.innerHTML = `<div style="width:100%; text-align:center; padding:10px; color:#3e2723; font-weight:bold;">Agent Mode Active</div>`;
       } else {
-        document.getElementById('page-title').innerText = "Yellow Brick Road"; 
-        hideAllOverlays(); // FIX: Ensure clean start
-        switchTab('chat');
+        document.getElementById('page-title').innerText = "Yellow Brick Road"; switchTab('chat');
         nav.innerHTML = `
           <button class="nav-item active" onclick="switchTab('chat')"><i class="fas fa-comments"></i> Brick</button>
           <button class="nav-item" onclick="switchTab('map')"><i class="fas fa-map-marked-alt"></i> Map</button>
@@ -318,7 +317,7 @@
       document.getElementById('lesson-viewer').style.display = 'none';
       if(document.getElementById('art-studio')) document.getElementById('art-studio').style.display = 'none';
     }
-
+    
     function updateBeds(change) {
       bedCount += change; if(bedCount < 0) bedCount = 0;
       document.getElementById('bed-count-display').innerText = bedCount;
