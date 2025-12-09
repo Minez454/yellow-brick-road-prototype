@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- Icons / Map -->
+  https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css
+  https://unpkg.com/leaflet@1.9.4/dist/leaflet.css
+  https://unpkg.com/leaflet@1.9.4/dist/leaflet.js</script>
 
   <style>
     /* --- GLOSSY THEME PALETTE --- */
@@ -18,23 +21,49 @@
 
     /* --- GLOBAL --- */
     * { box-sizing: border-box; }
-    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--cream-flat); color: var(--text-dark); margin: 0; padding: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--cream-flat);
+      color: var(--text-dark);
+      margin: 0; padding: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden;
+    }
     button { cursor: pointer; }
 
     /* --- LOGIN --- */
-    #landing-screen, #login-screen { position: absolute; top:0; left:0; width:100%; height:100%; background: radial-gradient(circle at center, #2c3e50 0%, #000 100%); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; text-align: center; }
+    #landing-screen, #login-screen {
+      position: absolute; top:0; left:0; width:100%; height:100%;
+      background: radial-gradient(circle at center, #2c3e50 0%, #000 100%);
+      z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      color: white; text-align: center;
+    }
     #login-screen { display: none; }
     .ybr-logo { margin-bottom: 20px; filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.6)); }
-    .landing-btn { width: 85%; padding: 18px; margin: 10px; background: var(--gold-shine); border: 1px solid white; border-radius: 30px; color: var(--text-dark); font-weight: 900; font-size: 1.1rem; text-transform: uppercase; box-shadow: 0 4px 15px rgba(255, 193, 7, 0.4); }
-    .login-input { width: 80%; padding: 15px; margin: 10px 0; border-radius: 10px; border: 2px solid #ffc107; font-size: 1rem; }
-    .login-btn { width: 80%; padding: 15px; margin-top: 20px; background: var(--gold-shine); color: var(--text-dark); font-weight: bold; border: none; border-radius: 30px; font-size: 1.1rem; }
+    .landing-btn {
+      width: 85%; padding: 18px; margin: 10px; background: var(--gold-shine); border: 1px solid white; border-radius: 30px;
+      color: var(--text-dark); font-weight: 900; font-size: 1.1rem; text-transform: uppercase; box-shadow: 0 4px 15px rgba(255, 193, 7, 0.4);
+    }
+    .login-input {
+      width: 80%; padding: 15px; margin: 10px 0; border-radius: 10px; border: 2px solid #ffc107; font-size: 1rem;
+    }
+    .login-btn {
+      width: 80%; padding: 15px; margin-top: 20px; background: var(--gold-shine); color: var(--text-dark);
+      font-weight: bold; border: none; border-radius: 30px; font-size: 1.1rem;
+    }
     .back-link { color: #ffecb3; margin-top: 20px; text-decoration: underline; cursor: pointer; }
 
     /* --- HEADER --- */
-    .header { padding: 15px 20px; background: linear-gradient(180deg, #ffc107 0%, #ffca28 50%, #ffc107 100%); border-bottom: 4px solid #b78900; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); z-index: 100; }
+    .header {
+      padding: 15px 20px; background: linear-gradient(180deg, #ffc107 0%, #ffca28 50%, #ffc107 100%);
+      border-bottom: 4px solid #b78900; display: flex; justify-content: space-between; align-items: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1); z-index: 100;
+    }
     h1 { color: var(--text-dark); font-size: 1.4rem; margin: 0; font-weight: 900; text-transform: uppercase; text-shadow: 0 1px 0 rgba(255,255,255,0.6); }
-    .status-badge { background: white; color: var(--emerald); padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; border: 2px solid var(--emerald); }
-    .live-dot { height: 8px; width: 8px; background-color: var(--emerald); border-radius: 50%; display: inline-block; margin-right: 5px; animation: pulse 1.5s infinite; }
+    .status-badge {
+      background: white; color: var(--emerald); padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; border: 2px solid var(--emerald);
+    }
+    .live-dot {
+      height: 8px; width: 8px; background-color: var(--emerald); border-radius: 50%; display: inline-block; margin-right: 5px; animation: pulse 1.5s infinite;
+    }
     @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
 
     /* --- SCREENS --- */
@@ -54,7 +83,7 @@
     .card-title { font-weight: bold; font-size: 1rem; color: #333; margin-bottom: 4px; }
     .card-desc { font-size: 0.85rem; color: #666; }
     .card-icon { float: left; width: 45px; height: 45px; border-radius: 50%; background: #eee; display: flex; align-items: center; justify-content: center; margin-right: 15px; color: #555; font-size: 1.2rem; flex-shrink: 0; }
-    
+
     /* --- AGENCY VIEWER --- */
     #agency-viewer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--cream-flat); z-index: 250; display: none; flex-direction: column; }
     .av-header { background: white; padding: 20px; border-bottom: 1px solid #ddd; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
@@ -71,34 +100,33 @@
     input { flex-grow: 1; padding: 12px 15px; border: 1px solid #ddd; border-radius: 25px; outline: none; background: #f9f9f9; }
     .send-btn { background: var(--gold-shine); color: var(--text-dark); border: none; padding: 0 24px; border-radius: 25px; font-weight: bold; }
 
-    /* --- NAV BAR (THE FINAL FIX - MAX COMPRESSION) --- */
-    .nav-bar { 
-      background: linear-gradient(180deg, #ffc107 0%, #ffca28 100%); 
-      border-top: 3px solid #b78900; 
-      display: flex; 
-      justify-content: space-evenly; 
-      padding: 8px 5px; 
-      flex-shrink: 0; 
-      z-index: 200; 
-      overflow-x: scroll; 
-      white-space: nowrap; 
+    /* --- NAV BAR --- */
+    .nav-bar {
+      background: linear-gradient(180deg, #ffc107 0%, #ffca28 100%);
+      border-top: 3px solid #b78900;
+      display: flex; justify-content: space-evenly; padding: 8px 5px;
+      flex-shrink: 0; z-index: 200; overflow-x: auto; white-space: nowrap;
     }
-    .nav-item { 
-      text-align: center; color: var(--text-dark); opacity: 0.6; background: none; border: none; 
-      font-size: 0.65rem; 
-      font-weight: 700; display: flex; flex-direction: column; align-items: center; 
-      padding: 0 1px;
-      min-width: 16%;
+    .nav-item {
+      text-align: center; color: var(--text-dark); opacity: 0.6; background: none; border: none;
+      font-size: 0.65rem; font-weight: 700; display: flex; flex-direction: column; align-items: center;
+      padding: 0 1px; min-width: 16%;
     }
     .nav-item.active { opacity: 1; transform: translateY(-2px); text-shadow: 0 1px 0 rgba(255,255,255,0.5); }
     .nav-item i { display: block; font-size: 1.2rem; margin-bottom: 2px; }
 
     /* --- AGENCY CATEGORIES --- */
-    .category-header { font-size: 0.9rem; color: #8a6d3b; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-top: 20px; margin-bottom: 10px; border-bottom: 2px solid #ffc107; padding-bottom: 5px; }
+    .category-header {
+      font-size: 0.9rem; color: #8a6d3b; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;
+      margin-top: 20px; margin-bottom: 10px; border-bottom: 2px solid #ffc107; padding-bottom: 5px;
+    }
 
     /* --- VAULT STYLES --- */
     .vault-section { margin-bottom: 30px; }
-    .vault-header { font-size: 0.9rem; color: #8a6d3b; font-weight: 800; text-transform: uppercase; margin-bottom: 15px; border-bottom: 2px solid #e0d0b8; padding-bottom: 5px; display: flex; justify-content: space-between; align-items: center; }
+    .vault-header {
+      font-size: 0.9rem; color: #8a6d3b; font-weight: 800; text-transform: uppercase; margin-bottom: 15px;
+      border-bottom: 2px solid #e0d0b8; padding-bottom: 5px; display: flex; justify-content: space-between; align-items: center;
+    }
     .wallet-item { background: linear-gradient(135deg, #fff, #f9f9f9); border-radius: 10px; padding: 15px; margin-bottom: 10px; border: 1px solid #ddd; box-shadow: 0 2px 5px rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: space-between; }
     .wallet-badge { font-size: 0.7rem; background: #e8f5e9; color: var(--emerald); padding: 3px 8px; border-radius: 10px; font-weight: bold; border: 1px solid var(--emerald); }
     .file-item { background: white; border-bottom: 1px solid #eee; padding: 15px 10px; display: flex; align-items: center; }
@@ -112,7 +140,7 @@
     .btn-minus { background: white; color: var(--ruby); border: 2px solid var(--ruby); }
     .btn-plus { background: white; color: var(--emerald); border: 2px solid var(--emerald); }
 
-    /* Map Styles */
+    /* --- Map Styles --- */
     #map-controls { padding: 10px; background: white; border-bottom: 1px solid #ddd; }
     .day-btn { background: #f5f5f5; border: 1px solid #ccc; padding: 8px 18px; border-radius: 20px; margin-right: 8px; font-weight: bold; color: #666; }
     .day-btn.active { background: var(--gold-shine); color: var(--text-dark); border: 1px solid #b78900; }
@@ -121,24 +149,42 @@
     .dir-item { padding: 15px; border-bottom: 1px solid #eee; display: flex; align-items: center; }
     .dir-icon { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px; font-size: 1.2rem; color: white; flex-shrink: 0; }
 
-    /* Academy */
+    /* --- Academy --- */
     .flashcard-box { background: linear-gradient(135deg, #2c3e50, #4ca1af); padding: 20px; border-radius: 15px; color: white; margin-bottom: 25px; text-align: center; }
     .fc-btn { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.5); color: white; padding: 8px 20px; border-radius: 20px; margin: 0 5px; }
     .doc-status { font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; }
     .verified { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-    
-    /* Lesson Viewer */
-    #lesson-viewer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #fbfbf8; z-index: 300; display: flex; flex-direction: column; }
+
+    /* --- Lesson Viewer --- */
+    #lesson-viewer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #fbfbf8; z-index: 300; display: none; flex-direction: column; }
     .viewer-content { flex: 1; padding: 20px; overflow-y: auto; }
     .intel-box { background: #fffde7; color: #5d4037; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #ffc107; }
 
+    /* --- Art Studio --- */
+    #art-studio { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.2); z-index: 350; flex-direction: column; }
+    .studio-header { background: #fff; padding: 10px 15px; display:flex; justify-content: space-between; align-items:center; border-bottom: 1px solid #eee; }
+    #canvas-wrapper { flex:1; background:#fff; }
+    .studio-toolbar { background:#fff; padding:10px; border-top:1px solid #eee; }
+    .tool-row { display:flex; gap:8px; }
+    .tool-btn { padding:6px 10px; border:1px solid #ccc; background:#f7f7f7; border-radius:6px; }
+    .tool-btn.active { border-color:#ffc107; }
   </style>
 </head>
 <body>
 
+  <!-- Landing -->
   <div id="landing-screen">
     <svg class="ybr-logo" width="180" height="180" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-      <defs><radialGradient id="skyGlow" cx="50%" cy="50%" r="50%"><stop offset="0%" style="stop-color:#81d4fa;stop-opacity:1"/><stop offset="100%" style="stop-color:#01579b;stop-opacity:1"/></radialGradient><linearGradient id="roadGold" x1="0%" y1="100%" x2="0%" y2="0%"><stop offset="0%" style="stop-color:#ffd700;stop-opacity:1"/><stop offset="100%" style="stop-color:#fff176;stop-opacity:1"/></linearGradient></defs>
+      <defs>
+        <radialGradient id="skyGlow" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" style="stop-color:#81d4fa;stop-opacity:1"/>
+          <stop offset="100%" style="stop-color:#01579b;stop-opacity:1"/>
+        </radialGradient>
+        <linearGradient id="roadGold" x1="0%" y1="100%" x2="0%" y2="0%">
+          <stop offset="0%" style="stop-color:#ffd700;stop-opacity:1"/>
+          <stop offset="100%" style="stop-color:#fff176;stop-opacity:1"/>
+        </linearGradient>
+      </defs>
       <circle cx="100" cy="100" r="95" fill="url(#skyGlow)" stroke="#ffd700" stroke-width="5" />
       <path d="M 80 100 L 90 60 L 100 90 L 110 50 L 120 90 L 130 70 L 140 100 Z" fill="#00e676" opacity="0.9" />
       <path d="M 100 100 L 140 180 Q 100 190 60 180 Z" fill="url(#roadGold)" stroke="#f57f17" stroke-width="1" />
@@ -150,21 +196,28 @@
     <button class="landing-btn" onclick="showLogin('agent')"><i class="fas fa-building"></i> Agent Access</button>
   </div>
 
+  <!-- Login -->
   <div id="login-screen">
     <h2 style="color:#ffc107; margin-bottom:20px; text-transform:uppercase; font-weight:900;" id="login-title">Login</h2>
     <input type="text" id="username" class="login-input" placeholder="Username">
     <input type="password" id="password" class="login-input" placeholder="Password">
     <button class="login-btn" onclick="attemptLogin()">Sign In</button>
     <div class="back-link" onclick="location.reload()">Back to Selection</div>
-    <div style="margin-top:30px; color:#ccc; font-size:0.8rem; background:rgba(0,0,0,0.4); padding:15px; border-radius:10px;">Demo Defaults:<br>Member: <b>Member</b> / <b>Passw0rd</b><br>Agent: <b>Agent</b> / <b>Passw0rd</b></div>
+    <div style="margin-top:30px; color:#ccc; font-size:0.8rem; background:rgba(0,0,0,0.4); padding:15px; border-radius:10px;">
+      Demo Defaults:<br>
+      Member: <b>Member</b> / <b>Passw0rd</b><br>
+      Agent: <b>Agent</b> / <b>Passw0rd</b>
+    </div>
   </div>
 
+  <!-- Main App -->
   <div id="main-app" style="display:none; height:100%; flex-direction:column;">
     <div class="header">
       <h1 id="page-title">Yellow Brick Road</h1>
       <div class="status-badge" onclick="location.reload()"><span class="live-dot"></span>Live Network</div>
     </div>
 
+    <!-- Chat -->
     <div id="chat-screen" class="screen active">
       <div id="chat-container">
         <div class="message bot-message">Hello. I am Brick. Think of me as a partner on your journey home. Tell me what's going on, and we will handle it together.</div>
@@ -175,6 +228,7 @@
       </div>
     </div>
 
+    <!-- Map -->
     <div id="map-screen" class="screen">
       <div id="map-controls">
         <button class="day-btn" onclick="filterMap('Mon')">Mon</button>
@@ -184,6 +238,7 @@
       <div id="directory-list"></div>
     </div>
 
+    <!-- Portal -->
     <div id="portal-screen" class="screen">
       <div class="content-pad">
         <div style="margin-bottom:20px;">
@@ -192,21 +247,34 @@
         </div>
         <div class="card" style="background:#f0fff4; border-left-color:var(--emerald);">
           <div style="display:flex; justify-content:space-between; align-items:center;">
-            <div><div class="card-title" style="margin:0;">The Shade Tree</div><div class="card-desc">Live Status</div></div>
-            <div style="text-align:right;"><span style="font-size:1.5rem; font-weight:bold; color:var(--emerald);" id="portal-bed-count">3</span><div style="font-size:0.7rem; font-weight:bold; color:var(--emerald);">BEDS OPEN</div></div>
+            <div>
+              <div class="card-title" style="margin:0;">The Shade Tree</div>
+              <div class="card-desc">Live Status</div>
+            </div>
+            <div style="text-align:right;">
+              <span style="font-size:1.5rem; font-weight:bold; color:var(--emerald);" id="portal-bed-count">3</span>
+              <div style="font-size:0.7rem; font-weight:bold; color:var(--emerald);">BEDS OPEN</div>
+            </div>
           </div>
         </div>
         <div style="font-size:0.8rem; color:#886; font-weight:800; margin-bottom:10px; text-transform:uppercase;">My Active Statuses</div>
-        <div class="card"><div class="card-content"><b>SNAP (Welfare)</b><br><span style="font-size:0.8rem; color:#666;">Application Pending</span></div><div style="font-weight:bold; color:#f0ad4e;">Under Review</div></div>
+        <div class="card">
+          <div class="card-content">
+            <b>SNAP (Welfare)</b><br><span style="font-size:0.8rem; color:#666;">Application Pending</span>
+          </div>
+          <div style="font-weight:bold; color:#f0ad4e;">Under Review</div>
+        </div>
       </div>
     </div>
 
+    <!-- Agencies -->
     <div id="agencies-screen" class="screen">
       <div class="content-pad">
         <div id="agency-list"></div>
       </div>
     </div>
 
+    <!-- Workbooks -->
     <div id="workbooks-screen" class="screen">
       <div class="content-pad">
         <div id="flashcard-container" class="flashcard-box">
@@ -219,19 +287,32 @@
       </div>
     </div>
 
+    <!-- Vault -->
     <div id="wallet-screen" class="screen">
       <div class="content-pad">
         <div class="vault-section">
           <div class="vault-header"><span><i class="fas fa-wallet"></i> My Wallet</span> <i class="fas fa-lock" style="color:var(--emerald);"></i></div>
-          <div class="wallet-item"><div style="display:flex; align-items:center;"><i class="fas fa-id-card wallet-icon" style="font-size:1.5rem; margin-right:15px; color:#555;"></i><div><b>State ID</b><br><span style="font-size:0.7rem; color:#666;">Nevada</span></div></div><span class="wallet-badge">VERIFIED</span></div>
+          <div class="wallet-item">
+            <div style="display:flex; align-items:center;">
+              <i class="fas fa-id-card wallet-icon" style="font-size:1.5rem; margin-right:15px; color:#555;"></i>
+              <div><b>State ID</b><br><span style="font-size:0.7rem; color:#666;">Nevada</span></div>
+            </div>
+            <span class="wallet-badge">VERIFIED</span>
+          </div>
         </div>
         <div class="vault-section">
           <div class="vault-header"><span><i class="fas fa-folder-open"></i> Paperwork</span></div>
-          <div class="wallet-item" style="border-left:none;"><div style="display:flex; align-items:center;"><i class="fas fa-file-pdf wallet-icon" style="font-size:1.5rem; margin-right:15px; color:#fbc02d;"></i> <b>Housing_App.pdf</b></div></div>
+          <div class="wallet-item" style="border-left:none;">
+            <div style="display:flex; align-items:center;">
+              <i class="fas fa-file-pdf wallet-icon" style="font-size:1.5rem; margin-right:15px; color:#fbc02d;"></i>
+              <b>Housing_App.pdf</b>
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
+    <!-- Agent -->
     <div id="agent-screen" class="screen">
       <div class="content-pad">
         <div style="text-align:center; margin-bottom:20px;">
@@ -249,31 +330,96 @@
       </div>
     </div>
 
+    <!-- Nav -->
     <div class="nav-bar" id="nav-bar"></div>
-
   </div>
 
-  <div id="agency-viewer"><div class="av-header"><span class="av-title" id="av-title">Agency Name</span><button onclick="closeAgency()" style="border:none; background:none; font-size:1.5rem;">&times;</button></div><div class="av-content" id="av-body"></div></div>
-  <div id="lesson-viewer"><div style="padding:15px; display:flex; justify-content:space-between; background:#ffc107;"><span id="view-title" style="font-weight:bold;">Guide</span><button onclick="document.getElementById('lesson-viewer').style.display='none'">X</button></div><div class="viewer-content" id="viewer-body"></div></div>
+  <!-- Overlays -->
+  <div id="agency-viewer" style="display:none;">
+    <div class="av-header">
+      <span class="av-title" id="av-title">Agency Name</span>
+      <button onclick="closeAgency()" style="border:none; background:none; font-size:1.5rem;">&times;</button>
+    </div>
+    <div class="av-content" id="av-body"></div>
+  </div>
+
+  <div id="lesson-viewer" style="display:none;">
+    <div style="padding:15px; display:flex; justify-content:space-between; background:#ffc107;">
+      <span id="view-title" style="font-weight:bold;">Guide</span>
+      <button onclick="document.getElementById('lesson-viewer').style.display='none'">X</button>
+    </div>
+    <div class="viewer-content" id="viewer-body"></div>
+  </div>
+
   <div id="art-studio">
-    <div class="studio-header"><span><i class="fas fa-palette"></i> Creative Studio</span><button onclick="closeStudio()" style="background:red; color:white; border:none; padding:5px 10px;">X</button></div>
+    <div class="studio-header">
+      <span><i class="fas fa-palette"></i> Creative Studio</span>
+      <button onclick="closeStudio()" style="background:red; color:white; border:none; padding:5px 10px;">X</button>
+    </div>
     <div id="canvas-wrapper"><canvas id="drawing-canvas"></canvas></div>
-    <div class="studio-toolbar"><div class="tool-row"><button class="tool-btn active" onclick="setTool('pencil')">Pencil</button></div></div>
+    <div class="studio-toolbar">
+      <div class="tool-row">
+        <button class="tool-btn active" onclick="setTool('pencil')">Pencil</button>
+      </div>
+    </div>
   </div>
 
   <script>
     // --- 1. GLOBAL STATE ---
     var userProfile = { hasPet: false, isVeteran: false, hasLegalIssues: false, noID: false };
-    var bedCount = 3; 
-    var lastContext = ""; 
+    var bedCount = 3;
+    var lastContext = "";
+    var map;
 
     // --- 2. DATA ---
     const agencies = [
-      { id: "snap", cat: "Welfare & Benefits", name: "SNAP (Welfare)", desc: "Food Assistance", tags: ["all"], icon: "fas fa-utensils", render: () => `<div class="av-module"><h3>Benefit Status</h3><p>Next Deposit: 5th of Month</p></div>` },
-      { id: "shade", cat: "Housing & Shelter", name: "The Shade Tree", desc: "Women & Pets", tags: ["hasPet"], icon: "fas fa-paw", render: () => `<div class="av-module"><span class="av-label">Live Availability</span><div class="av-big-text" style="color:#00c853;">${bedCount} Crates Open</div><p>We are accepting pets.</p></div>` },
-      { id: "legal", cat: "Legal & Courts", name: "Legal Aid Center", desc: "Warrant & Court Help", tags: ["hasLegalIssues"], icon: "fas fa-gavel", render: () => `<div class="av-module"><h3>Self-Help Law</h3><button class="av-btn">File Motion</button></div>` },
-      { id: "va", cat: "Veterans Services", name: "Veterans Affairs", desc: "CRRC & Housing", tags: ["isVeteran"], icon: "fas fa-flag-usa", render: () => `<div class="av-module"><span class="av-label">Status</span><div class="av-big-text" style="color:#007bff;">Open</div><p>Walk-ins welcome.</p></div>` },
-      { id: "dmv", cat: "Identity & Documents", name: "Project ID", desc: "Document Recovery", tags: ["noID"], icon: "fas fa-id-card", render: () => `<div class="av-module"><h3>ID Vouchers</h3><div class="av-big-text">Active</div></div>` }
+      {
+        id: "snap", cat: "Welfare & Benefits", name: "SNAP (Welfare)", desc: "Food Assistance", tags: ["all"], icon: "fas fa-utensils",
+        render: () => `
+          <div class="av-module">
+            <h3>Benefit Status</h3>
+            <p>Next Deposit: 5th of Month</p>
+          </div>
+        `
+      },
+      {
+        id: "shade", cat: "Housing & Shelter", name: "The Shade Tree", desc: "Women & Pets", tags: ["hasPet"], icon: "fas fa-paw",
+        render: () => `
+          <div class="av-module">
+            <span class="av-label">Live Availability</span>
+            <div class="av-big-text" style="color:#00c853;">${bedCount} Crates Open</div>
+            <p>We are accepting pets.</p>
+          </div>
+        `
+      },
+      {
+        id: "legal", cat: "Legal & Courts", name: "Legal Aid Center", desc: "Warrant & Court Help", tags: ["hasLegalIssues"], icon: "fas fa-gavel",
+        render: () => `
+          <div class="av-module">
+            <h3>Self-Help Law</h3>
+            <button class="av-btn">File Motion</button>
+          </div>
+        `
+      },
+      {
+        id: "va", cat: "Veterans Services", name: "Veterans Affairs", desc: "CRRC & Housing", tags: ["isVeteran"], icon: "fas fa-flag-usa",
+        render: () => `
+          <div class="av-module">
+            <span class="av-label">Status</span>
+            <div class="av-big-text" style="color:#007bff;">Open</div>
+            <p>Walk-ins welcome.</p>
+          </div>
+        `
+      },
+      {
+        id: "dmv", cat: "Identity & Documents", name: "Project ID", desc: "Document Recovery", tags: ["noID"], icon: "fas fa-id-card",
+        render: () => `
+          <div class="av-module">
+            <h3>ID Vouchers</h3>
+            <div class="av-big-text">Active</div>
+          </div>
+        `
+      }
     ];
 
     const workbooks = [
@@ -283,31 +429,48 @@
 
     // --- LOGIN ---
     var currentRole = "";
-    function showLogin(role) { currentRole = role; document.getElementById('landing-screen').style.display = 'none'; document.getElementById('login-screen').style.display = 'flex'; document.getElementById('login-title').innerText = role === 'member' ? 'Member Login' : 'Agent Access'; document.getElementById('username').value = ""; document.getElementById('password').value = ""; }
+    function showLogin(role) {
+      currentRole = role;
+      document.getElementById('landing-screen').style.display = 'none';
+      document.getElementById('login-screen').style.display = 'flex';
+      document.getElementById('login-title').innerText = role === 'member' ? 'Member Login' : 'Agent Access';
+      document.getElementById('username').value = "";
+      document.getElementById('password').value = "";
+    }
     function attemptLogin() {
       const u = document.getElementById('username').value; const p = document.getElementById('password').value;
-      if ((currentRole === 'member' && u === 'Member' && p === 'Passw0rd') || (currentRole === 'agent' && u === 'Agent' && p === 'Passw0rd')) {
-        document.getElementById('login-screen').style.display = 'none'; enterApp(currentRole);
-      } else alert("Invalid. Check demo defaults.");
+      if ((currentRole === 'member' && u === 'Member' && p === 'Passw0rd') ||
+          (currentRole === 'agent' && u === 'Agent' && p === 'Passw0rd')) {
+        document.getElementById('login-screen').style.display = 'none';
+        enterApp(currentRole);
+      } else {
+        alert("Invalid. Check demo defaults.");
+      }
     }
     function enterApp(mode) {
       document.getElementById('main-app').style.display = 'flex';
       const nav = document.getElementById('nav-bar');
-      hideAllOverlays(); // FIX: Ensure clean start
-      
+      hideAllOverlays();
+
       if (mode === 'agent') {
-        document.getElementById('page-title').innerText = "Agent Portal"; switchTab('agent');
-        nav.innerHTML = `<div style="width:100%; text-align:center; padding:10px; color:#3e2723; font-weight:bold;">Agent Mode Active</div>`;
-      } else {
-        document.getElementById('page-title').innerText = "Yellow Brick Road"; switchTab('chat');
+        document.getElementById('page-title').innerText = "Agent Portal";
+        switchTab('agent');
         nav.innerHTML = `
-          <button class="nav-item active" onclick="switchTab('chat')"><i class="fas fa-comments"></i> Brick</button>
-          <button class="nav-item" onclick="switchTab('map')"><i class="fas fa-map-marked-alt"></i> Map</button>
-          <button class="nav-item" onclick="switchTab('portal')"><i class="fas fa-columns"></i> Portal</button>
-          <button class="nav-item" onclick="switchTab('agencies')"><i class="fas fa-building"></i> Agencies</button>
-          <button class="nav-item" onclick="switchTab('workbooks')"><i class="fas fa-graduation-cap"></i> Workbooks</button>
-          <button class="nav-item" onclick="switchTab('vault')"><i class="fas fa-wallet"></i> Vault</button>`;
-        renderAgencies(); renderWorkbooks();
+          <div style="width:100%; text-align:center; padding:10px; color:#3e2723; font-weight:bold;">Agent Mode Active</div>
+        `;
+      } else {
+        document.getElementById('page-title').innerText = "Yellow Brick Road";
+        nav.innerHTML = `
+          <button class="nav-item active" data-tab="chat" onclick="switchTab('chat')"><i class="fas fa-comments"></i> Brick</button>
+          <button class="nav-item" data-tab="map" onclick="switchTab('map')"><i class="fas fa-map-marked-alt"></i> Map</button>
+          <button class="nav-item" data-tab="portal" onclick="switchTab('portal')"><i class="fas fa-columns"></i> Portal</button>
+          <button class="nav-item" data-tab="agencies" onclick="switchTab('agencies')"><i class="fas fa-building"></i> Agencies</button>
+          <button class="nav-item" data-tab="workbooks" onclick="switchTab('workbooks')"><i class="fas fa-graduation-cap"></i> Workbooks</button>
+          <button class="nav-item" data-tab="vault" onclick="switchTab('vault')"><i class="fas fa-wallet"></i> Vault</button>
+        `;
+        switchTab('chat');
+        renderAgencies();
+        renderWorkbooks();
       }
     }
 
@@ -315,18 +478,20 @@
     function hideAllOverlays() {
       document.getElementById('agency-viewer').style.display = 'none';
       document.getElementById('lesson-viewer').style.display = 'none';
-      if(document.getElementById('art-studio')) document.getElementById('art-studio').style.display = 'none';
+      if (document.getElementById('art-studio')) document.getElementById('art-studio').style.display = 'none';
     }
-    
+
     function updateBeds(change) {
-      bedCount += change; if(bedCount < 0) bedCount = 0;
-      document.getElementById('bed-count-display').innerText = bedCount;
-      if(document.getElementById('portal-bed-count')) document.getElementById('portal-bed-count').innerText = bedCount;
+      bedCount += change; if (bedCount < 0) bedCount = 0;
+      const agentDisplay = document.getElementById('bed-count-display');
+      const portalDisplay = document.getElementById('portal-bed-count');
+      if (agentDisplay) agentDisplay.innerText = bedCount;
+      if (portalDisplay) portalDisplay.innerText = bedCount;
     }
 
     function openAgency(id) {
       const agency = agencies.find(a => a.id === id);
-      if(!agency) return;
+      if (!agency) return;
       document.getElementById('av-title').innerText = agency.name;
       document.getElementById('av-body').innerHTML = agency.render();
       document.getElementById('agency-viewer').style.display = 'flex';
@@ -336,13 +501,23 @@
     function renderAgencies() {
       const list = document.getElementById('agency-list'); list.innerHTML = "";
       const categories = ["Welfare & Benefits", "Housing & Shelter", "Legal & Courts", "Veterans Services", "Identity & Documents"];
-      
       categories.forEach(cat => {
         const catAgencies = agencies.filter(a => a.cat === cat);
         if (catAgencies.length > 0) {
-          list.innerHTML += `<div class="category-header">${cat}</div>`;
+          list.innerHTML += `
+            <div class="category-header">${cat}</div>
+          `;
           catAgencies.forEach(a => {
-            list.innerHTML += `<div class="card recommended" onclick="openAgency('${a.id}')"><div class="rec-badge">OPEN</div><div class="card-icon"><i class="${a.icon}"></i></div><div class="card-content"><div class="card-title">${a.name}</div><div class="card-desc">${a.desc}</div></div></div>`;
+            list.innerHTML += `
+              <div class="card recommended" onclick="openAgency('${a.id}')">
+                <div class="rec-badge">OPEN</div>
+                <div class="card-icon"><i class="${a.icon}"></i></div>
+                <div class="card-content">
+                  <div class="card-title">${a.name}</div>
+                  <div class="card-desc">${a.desc}</div>
+                </div>
+              </div>
+            `;
           });
         }
       });
@@ -352,67 +527,105 @@
       const aList = document.getElementById('academy-list'); aList.innerHTML = "";
       workbooks.forEach(w => {
         if (w.tags.some(t => userProfile[t])) {
-          aList.innerHTML += `<div class="card recommended" onclick="openLesson('${w.title}', '${w.intel}', '${w.steps}')"><div class="rec-badge">GUIDE</div><div class="card-title">${w.title}</div><div class="card-desc">${w.desc}</div></div>`;
+          aList.innerHTML += `
+            <div class="card recommended" onclick="openLesson('${w.title}', '${w.intel}', ${JSON.stringify(w.steps)})">
+              <div class="rec-badge">GUIDE</div>
+              <div class="card-title">${w.title}</div>
+              <div class="card-desc">${w.desc}</div>
+            </div>
+          `;
         }
       });
     }
 
     // --- CHAT ---
-    var lastContext = "";
-    function handleEnterChat(e) { if(e.key==="Enter") sendChatMessage(); }
+    function handleEnterChat(e) { if (e.key === "Enter") sendChatMessage(); }
     function sendChatMessage() {
-      var input = document.getElementById("user-input"); var text = input.value.trim(); if(!text) return;
-      document.getElementById('chat-container').innerHTML += `<div class="message user-message">${text}</div>`; input.value="";
-      
-      var lc = text.toLowerCase(); var resp = "";
+      var input = document.getElementById("user-input");
+      var text = input.value.trim();
+      if (!text) return;
+      document.getElementById('chat-container').innerHTML += `
+        <div class="message user-message">${text}</div>
+      `;
+      input.value = "";
+
+      var lc = text.toLowerCase(); var resp = "I am ready. Tell me what you need.";
       if (lc.includes("dog") || lc.includes("pet")) lastContext = "pet";
       if (lc.includes("vet") || lc.includes("military")) userProfile.isVeteran = true;
 
-      if(lc.includes("suicide")) resp = "Please call 988. I want you to be safe.";
-      else if(lastContext === "pet" && lc.includes("avail")) resp = `<b>Live Update:</b> Noah's Animal House currently has <b>${bedCount} Kennels Available</b>.`;
-      else if(lc.includes("dog") || lc.includes("vet") || lc.includes("warrant")) {
-        if(lc.includes("dog")) lastContext = "pet";
+      if (lc.includes("suicide")) {
+        resp = "Please call 988. I want you to be safe.";
+      } else if (lastContext === "pet" && lc.includes("avail")) {
+        resp = `<b>Live Update:</b> Noah's Animal House currently has <b>${bedCount} Kennels Available</b>.`;
+      } else if (lc.includes("dog") || lc.includes("vet") || lc.includes("warrant")) {
+        if (lc.includes("dog")) lastContext = "pet";
         resp = "I hear you. Let's tackle this.<br><br>I've highlighted <b>The Shade Tree</b> in your Agencies tab.";
-        renderAgencies(); 
-      } else resp = "I am ready. Tell me what you need.";
-      
-      setTimeout(() => { document.getElementById('chat-container').innerHTML += `<div class="message bot-message">${resp}</div>`; }, 600);
+        renderAgencies();
+      }
+
+      setTimeout(() => {
+        document.getElementById('chat-container').innerHTML += `
+          <div class="message bot-message">${resp}</div>
+        `;
+      }, 600);
     }
 
     // --- MAP ---
-    var map;
-    function initMap() { if(map) return; map = L.map('map-frame').setView([36.1699, -115.1398], 11); L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map); filterMap("All"); }
     const locations = [{ name: "Catholic Charities", lat: 36.178, lng: -115.140, type: "Soup Kitchen" }];
-    function filterMap(day) { locations.forEach(loc => L.marker([loc.lat, loc.lng]).addTo(map).bindPopup(loc.name)); }
+    function initMap() {
+      if (map) return;
+      map = L.map('map-frame').setView([36.1699, -115.1398], 11);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+      filterMap("All");
+    }
+    function filterMap(day) {
+      if (!map) return;
+      locations.forEach(loc => L.marker([loc.lat, loc.lng]).addTo(map).bindPopup(loc.name));
+    }
 
+    // --- NAV / TABS ---
     function switchTab(t) {
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
       document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-      
-      let sid = "";
-      if(t === "chat") sid = "chat-screen";
-      else if(t === "map") sid = "map-screen";
-      else if(t === "portal") sid = "portal-screen";
-      else if(t === "agencies") sid = "agencies-screen";
-      else if(t === "workbooks") sid = "workbooks-screen";
-      else if(t === "vault") sid = "wallet-screen";
-      else if(t === "agent") sid = "agent-screen";
 
-      document.getElementById(sid).classList.add('active');
-      if(document.querySelector(`[onclick="switchTab('${t}')"]`)) document.querySelector(`[onclick="switchTab('${t}')"]`).classList.add('active');
-      if(t === 'map') setTimeout(initMap, 200);
+      let sid = "";
+      if (t === "chat") sid = "chat-screen";
+      else if (t === "map") sid = "map-screen";
+      else if (t === "portal") sid = "portal-screen";
+      else if (t === "agencies") sid = "agencies-screen";
+      else if (t === "workbooks") sid = "workbooks-screen";
+      else if (t === "vault") sid = "wallet-screen";
+      else if (t === "agent") sid = "agent-screen";
+
+      if (sid) document.getElementById(sid).classList.add('active');
+      const navItem = document.querySelector(`.nav-item[data-tab="${t}"]`);
+      if (navItem) navItem.classList.add('active');
+      if (t === 'map') setTimeout(initMap, 200);
     }
 
-    function openLesson(t, i, s) { document.getElementById('viewer-body').innerHTML = `<h3>${t}</h3><div class="intel-box">${i}</div>`; document.getElementById('lesson-viewer').style.display = 'flex'; }
+    function openLesson(title, intel, steps) {
+      const stepsHtml = Array.isArray(steps) ? `<ol>${steps.map(s => `<li>${s}</li>`).join('')}</ol>` : "";
+      document.getElementById('viewer-body').innerHTML = `
+        <h3>${title}</h3>
+        <div class="intel-box">${intel}</div>
+        ${stepsHtml}
+      `;
+      document.getElementById('lesson-viewer').style.display = 'flex';
+    }
+
     let fIdx = 0;
-    function answerFlashcard(a) { if(a==='yes') { userProfile.hasPet = true; renderWorkbooks(); } document.getElementById('flashcard-container').style.display='none'; }
+    function answerFlashcard(a) {
+      if (a === 'yes') { userProfile.hasPet = true; renderWorkbooks(); }
+      document.getElementById('flashcard-container').style.display='none';
+    }
 
     // Art Studio Stubs
     function openStudio() { document.getElementById('art-studio').style.display='flex'; }
     function closeStudio() { document.getElementById('art-studio').style.display='none'; }
     function setTool(t) {}
 
+    // Initial render so Agencies tab isn’t empty before login
     renderAgencies();
   </script>
 </body>
-</html>
+
