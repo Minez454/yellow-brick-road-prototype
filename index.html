@@ -4,22 +4,21 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Icons / Map -->
+  <!-- Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <style>
-    /* --- GLOBAL --- */
     * { box-sizing: border-box; }
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       margin: 0; padding: 0;
       display: flex; flex-direction: column;
       height: 100vh; overflow: hidden;
+      background: #fbfbf8;
+      color: #3e2723;
     }
 
-    /* --- CHAT --- */
+    /* Chat container */
     #chat-container {
       flex: 1;
       overflow-y: auto;
@@ -27,7 +26,7 @@
       display: flex;
       flex-direction: column;
       gap: 15px;
-      margin-bottom: 120px; /* leave room for input + nav */
+      margin-bottom: 120px; /* space for input + nav */
     }
     .message {
       padding: 12px 18px;
@@ -47,6 +46,7 @@
       font-weight: 600;
     }
 
+    /* Input area */
     .input-area {
       position: fixed;
       bottom: 55px; /* sits above nav-bar */
@@ -76,7 +76,7 @@
       font-weight: bold;
     }
 
-    /* --- NAV BAR --- */
+    /* Nav bar */
     .nav-bar {
       background: linear-gradient(180deg, #ffc107 0%, #ffca28 100%);
       border-top: 3px solid #b78900;
@@ -116,28 +116,25 @@
 </head>
 <body>
 
-  <!-- Main App -->
-  <div id="main-app" style="height:100%; flex-direction:column;">
-    <!-- Chat -->
-    <div id="chat-screen" class="screen active">
-      <div id="chat-container">
-        <div class="message bot-message">Hello. I am Brick. Think of me as a partner on your journey home. Tell me what's going on, and we will handle it together.</div>
-      </div>
-      <div class="input-area">
-        <input type="text" id="user-input" placeholder="Type here..." onkeydown="handleEnterChat(event)">
-        <button class="send-btn" onclick="sendChatMessage()">Send</button>
-      </div>
+  <!-- Chat screen -->
+  <div id="chat-screen">
+    <div id="chat-container">
+      <div class="message bot-message">Hello. I am Brick. Think of me as a partner on your journey home. Tell me what's going on, and we will handle it together.</div>
     </div>
+    <div class="input-area">
+      <input type="text" id="user-input" placeholder="Type here..." onkeydown="handleEnterChat(event)">
+      <button class="send-btn" onclick="sendChatMessage()">Send</button>
+    </div>
+  </div>
 
-    <!-- Nav -->
-    <div class="nav-bar" id="nav-bar">
-      <button class="nav-item active" data-tab="chat"><i class="fas fa-comments"></i> Brick</button>
-      <button class="nav-item" data-tab="map"><i class="fas fa-map-marked-alt"></i> Map</button>
-      <button class="nav-item" data-tab="portal"><i class="fas fa-columns"></i> Portal</button>
-      <button class="nav-item" data-tab="agencies"><i class="fas fa-building"></i> Agencies</button>
-      <button class="nav-item" data-tab="workbooks"><i class="fas fa-graduation-cap"></i> Workbooks</button>
-      <button class="nav-item" data-tab="vault"><i class="fas fa-wallet"></i> Vault</button>
-    </div>
+  <!-- Nav bar -->
+  <div class="nav-bar" id="nav-bar">
+    <button class="nav-item active" data-tab="chat"><i class="fas fa-comments"></i> Brick</button>
+    <button class="nav-item" data-tab="map"><i class="fas fa-map-marked-alt"></i> Map</button>
+    <button class="nav-item" data-tab="portal"><i class="fas fa-columns"></i> Portal</button>
+    <button class="nav-item" data-tab="agencies"><i class="fas fa-building"></i> Agencies</button>
+    <button class="nav-item" data-tab="workbooks"><i class="fas fa-graduation-cap"></i> Workbooks</button>
+    <button class="nav-item" data-tab="vault"><i class="fas fa-wallet"></i> Vault</button>
   </div>
 
   <script>
