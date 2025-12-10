@@ -251,9 +251,7 @@ border-radius: 8px; font-weight: bold; margin-top: 10px; color: var(--text-dark)
 
   <div id="map-screen" class="screen">
     <div id="map-controls">
-      <button class="day-btn" onclick="filterMap('Mon')">Mon</button>
-      <button class="day-btn active" onclick="filterMap('All')">All</button>
-    </div>
+      </div>
     <div id="map-frame"></div>
     <div id="directory-list"></div>
   </div>
@@ -560,7 +558,40 @@ const workbooks = [
   { id: "legal", title: "Warrants", desc: "Quashing Tickets", tags: ["hasLegalIssues"], intel: "Don't ignore fines, especially traffic tickets. Legal Aid can help.", steps: ["Call Court Clerk.", "Request a hearing."] }
 ];
 
-// --- Map Locations Update ---
+// This is the new food-specific location array for the map tab
+const foodResources = [
+  // Catholic Charities (Daily Meals) - Open Daily
+  { name: "Catholic Charities (Meals)", lat: 36.1732, lng: -115.1385, type: "Soup Kitchen/Daily Meal", icon: "fas fa-utensils",
+    schedule: { day: "All", hours: "10:00 AM - 1:00 PM", notes: "Open every day. ID not required for food." } },
+  
+  // Las Vegas Rescue Mission (Meals) - Daily
+  { name: "LV Rescue Mission (Meals)", lat: 36.1710, lng: -115.1430, type: "Daily Meal Service", icon: "fas fa-utensils",
+    schedule: { day: "All", hours: "Lunch: 12:00 PM, Dinner: 5:00 PM", notes: "ID not required. Located near Downtown." } },
+
+  // Three Square Food Bank Agency (Pantry Example) - Weekdays
+  { name: "Three Square Partner Pantry A", lat: 36.1550, lng: -115.1400, type: "Food Pantry (By Appt)", icon: "fas fa-box-open",
+    schedule: { day: "Mon", hours: "9:00 AM - 12:00 PM", notes: "Appointment required. Bring ID and proof of address." } },
+  { name: "Three Square Partner Pantry B", lat: 36.1600, lng: -115.1550, type: "Food Pantry (Walk-in)", icon: "fas fa-box-open",
+    schedule: { day: "Tue", hours: "1:00 PM - 4:00 PM", notes: "Walk-in. Must be a Southern Nevada resident." } },
+  { name: "Three Square Partner Pantry C", lat: 36.1800, lng: -115.1500, type: "Food Pantry (Walk-in)", icon: "fas fa-box-open",
+    schedule: { day: "Wed", hours: "9:00 AM - 1:00 PM", notes: "Walk-in. Bring a bag." } },
+    
+  // Shade Tree (Women/Children only) - Daily
+  { name: "The Shade Tree (Residents/Clients)", lat: 36.1960, lng: -115.1280, type: "Shelter Food Service", icon: "fas fa-paw",
+    schedule: { day: "All", hours: "3 Meals Daily", notes: "For clients of the shelter and their children." } },
+    
+  // Monday Meal (Specific Service Example)
+  { name: "Monday Night Hot Meal", lat: 36.1750, lng: -115.1410, type: "Hot Meal Service", icon: "fas fa-fire",
+    schedule: { day: "Mon", hours: "6:00 PM - 7:00 PM", notes: "Outdoor service. No requirements." } },
+
+  // Weekend Service Example
+  { name: "Weekend Pantry", lat: 36.1500, lng: -115.1300, type: "Food Pantry", icon: "fas fa-box-open",
+    schedule: { day: "Sat", hours: "10:00 AM - 1:00 PM", notes: "Walk-in service. Open to all." } },
+  { name: "Sunday Soup Kitchen", lat: 36.1620, lng: -115.1350, type: "Soup Kitchen", icon: "fas fa-utensils",
+    schedule: { day: "Sun", hours: "11:00 AM - 1:00 PM", notes: "No requirements." } }
+];
+
+// The old 'locations' array is kept for agency reference if needed
 const locations = [
   { name: "The Courtyard HRC", lat: 36.188, lng: -115.137, type: "24/7 Shelter Hub", day: "All" },
   { name: "Catholic Charities (Food/ID)", lat: 36.173, lng: -115.138, type: "Food/Documents", day: "All" },
@@ -572,6 +603,7 @@ const locations = [
   { name: "Huntridge Family Clinic", lat: 36.160, lng: -115.127, type: "Medical Clinic", day: "Mon-Fri" },
   { name: "Veterans Village", lat: 36.165, lng: -115.140, type: "Veteran Housing", day: "All" },
 ];
+
 
 // --- App entry (no login) ---
 function enterApp(mode) {
@@ -762,7 +794,7 @@ function sendChatMessage() {
   
   // --- 2. CONTEXTUAL & GENERAL RESPONSES ---
   } else if (lc.includes("map")) {
-      resp = "The Map tab shows resources near your current location. You can filter them by day, too!";
+      resp = "The Map tab shows food resources near your current location, filtered by the day of the week to see what's open now!";
   } else if (lc.includes("portal")) {
       resp = "Your Portal shows a snapshot of your status and any open shelter availability. That's where you see your pending SNAP application.";
   } else if (lc.includes("vault") || lc.includes("wallet")) {
@@ -787,32 +819,62 @@ function sendChatMessage() {
   }, 600);
 }
 
-// --- Map ---
+
+// --- Map Update: Controls and Filtering Logic ---
 function initMap() {
   if (map) return;
   // Centered on Downtown Las Vegas area
   map = L.map('map-frame').setView([36.175, -115.145], 13); 
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-  filterMap("All");
+  // Default to today's day
+  const today = new Date().toLocaleDateString('en-US', { weekday: 'short' });
+  renderMapControls(today);
+  filterMap(today);
 }
+
+function renderMapControls(activeDay) {
+  const controls = document.getElementById('map-controls');
+  const days = ["All", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  controls.innerHTML = '';
+  days.forEach(day => {
+    const activeClass = (day === activeDay) ? ' active' : '';
+    controls.innerHTML += `<button class="day-btn${activeClass}" onclick="filterMap('${day}')">${day}</button>`;
+  });
+}
+
 function filterMap(day) {
   if (!map) return;
   // Clear existing markers
   map.eachLayer(layer => { if (layer instanceof L.Marker) map.removeLayer(layer); });
-  const dir = document.getElementById('directory-list'); dir.innerHTML = "";
-  locations.filter(l => day === "All" || l.day === day).forEach(loc => {
-    L.marker([loc.lat, loc.lng]).addTo(map).bindPopup(loc.name);
+  const dir = document.getElementById('directory-list'); 
+  dir.innerHTML = "";
+
+  // 1. Filter Resources
+  const filteredLocations = foodResources.filter(loc => 
+    loc.schedule.day === "All" || loc.schedule.day === day
+  );
+
+  // 2. Render Markers and List Items
+  filteredLocations.forEach(loc => {
+    // Add Marker
+    L.marker([loc.lat, loc.lng]).addTo(map).bindPopup(loc.name + '<br>' + loc.schedule.hours);
+    
+    // Add to Directory List
     dir.innerHTML += `
 <div class="dir-item">
-  <div class="dir-icon" style="background:#ffc107;"><i class="fas fa-map-pin"></i></div>
-  <div><b>${loc.name}</b><br><span style="font-size:0.8rem; color:#666;">${loc.type}</span></div>
+  <div class="dir-icon" style="background:#00c853;"><i class="${loc.icon}"></i></div>
+  <div>
+    <b>${loc.name}</b><br>
+    <span style="font-size:0.8rem; color:#666;">${loc.type}</span><br>
+    <span style="font-size:0.9rem; font-weight:bold; color:#d50000;">Hours: ${loc.schedule.hours}</span><br>
+    <span style="font-size:0.75rem; color:#886;">Needs: ${loc.schedule.notes}</span>
+  </div>
 </div>
 `;
   });
-  document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll('.day-btn').forEach(b => {
-    if (b.textContent.trim() === day) b.classList.add('active');
-  });
+
+  // 3. Update the day buttons to show the active tab
+  renderMapControls(day);
 }
 
 // --- Tabs ---
@@ -827,7 +889,9 @@ function switchTab(tabId) {
   if (target) target.classList.add('active');
   const navItem = document.querySelector(`.nav-item[data-tab="${tabId}"]`);
   if (navItem) navItem.classList.add('active');
-  if (tabId === 'map') setTimeout(initMap, 200);
+  
+  // Rerun map initialization to ensure correct controls and filters are active
+  if (tabId === 'map') setTimeout(initMap, 200); 
 }
 
 // --- Art Studio ---
