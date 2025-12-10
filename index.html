@@ -452,7 +452,6 @@ const workbooks = [
 
 // --- App entry (no login) ---
 function enterApp(mode) {
-  // We no longer need to set display: flex here if we removed display:none from the HTML
   const nav = document.getElementById('nav-bar');
   hideAllOverlays();
 
@@ -574,8 +573,10 @@ function sendChatMessage() {
   input.value = "";
 
   var lc = text.toLowerCase();
-  var resp = "I am ready. Tell me what you need.";
+  var resp = "";
+  var contextSwitched = false;
 
+  // --- 1. KEYWORD RESPONSES ---
   if (lc.includes("dog") || lc.includes("pet")) {
     lastContext = "pet";
     userProfile.hasPet = true;
@@ -585,20 +586,43 @@ function sendChatMessage() {
   } else if (lc.includes("suicide")) {
     resp = "Please call 988. I want you to be safe.";
   } else if (lc.includes("veteran") || lc.includes("military")) {
+    lastContext = "veteran";
     userProfile.isVeteran = true;
     resp = "Thank you. I've highlighted Veterans services in Agencies and Workbooks.";
     renderAgencies();
     renderWorkbooks();
-  } else if (lc.includes("warrant") || lc.includes("court")) {
+  } else if (lc.includes("warrant") || lc.includes("court") || lc.includes("legal")) {
+    lastContext = "legal";
     userProfile.hasLegalIssues = true;
     resp = "Understood. Legal Aid resources are highlighted in Agencies and Workbooks.";
     renderAgencies();
     renderWorkbooks();
-  } else if (lc.includes("id") || lc.includes("identification")) {
+  } else if (lc.includes("id") || lc.includes("identification") || lc.includes("birth certificate")) {
+    lastContext = "id";
     userProfile.noID = true;
     resp = "Let's work on ID recovery. Project ID is highlighted in Agencies.";
     renderAgencies();
+  } else if (lc.includes("shade tree") || lc.includes("shade")) {
+    lastContext = "shade";
+    resp = "The Shade Tree is a 24-hour safe shelter for women, children, and their pets right here in Las Vegas. They currently have <b>" + bedCount + " kennel spots</b> open. Check the Agencies tab for more details.";
+  
+  // --- 2. CONTEXTUAL & GENERAL RESPONSES ---
+  } else if (lc.includes("map")) {
+      resp = "The Map tab shows resources near your current location. You can filter them by day, too!";
+  } else if (lc.includes("portal")) {
+      resp = "Your Portal shows a snapshot of your status and any open shelter availability. That's where you see your pending SNAP application.";
+  } else if (lc.includes("vault") || lc.includes("wallet")) {
+      resp = "The Vault is a safe place for your documents like your State ID. You can upload other paperwork there too.";
+  } else if (lc.includes("workbooks") || lc.includes("guide")) {
+      resp = "Workbooks contain guides and lessons tailored to your needs, like K9 Safety if you have a pet.";
+
+  // --- 3. FALLBACK RESPONSE ---
+  } else {
+    // This is the improved general fallback response
+    resp = "I can help with that, but I'm still learning. To get you the best help right now, try keywords like: <b>pet</b>, <b>legal</b>, <b>ID</b>, or ask about one of the tabs: **Map**, **Agencies**, or **Vault**.";
+    lastContext = ""; // Clear context on unknown input
   }
+
 
   setTimeout(() => {
     document.getElementById('chat-container').innerHTML += `
