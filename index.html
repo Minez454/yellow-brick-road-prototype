@@ -4,7 +4,6 @@
 <meta charset="utf-8">
 <title>Yellow Brick Road</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<!-- Icons / Map -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -234,14 +233,12 @@ border-radius: 8px; font-weight: bold; margin-top: 10px; color: var(--text-dark)
 </head>
 <body>
 
-<!-- Main App -->
-<div id="main-app" style="display:none; height:100%; flex-direction:column;">
+<div id="main-app" style="height:100%; flex-direction:column;">
   <div class="header">
     <h1 id="page-title">Yellow Brick Road</h1>
     <div class="status-badge" onclick="location.reload()"><span class="live-dot"></span>Live Network</div>
   </div>
 
-  <!-- Chat -->
   <div id="chat-screen" class="screen active">
     <div id="chat-container">
       <div class="message bot-message">Hello. I am Brick. Think of me as a partner on your journey home. Tell me what's going on, and we will handle it together.</div>
@@ -252,7 +249,6 @@ border-radius: 8px; font-weight: bold; margin-top: 10px; color: var(--text-dark)
     </div>
   </div>
 
-  <!-- Map -->
   <div id="map-screen" class="screen">
     <div id="map-controls">
       <button class="day-btn" onclick="filterMap('Mon')">Mon</button>
@@ -262,7 +258,6 @@ border-radius: 8px; font-weight: bold; margin-top: 10px; color: var(--text-dark)
     <div id="directory-list"></div>
   </div>
 
-  <!-- Portal -->
   <div id="portal-screen" class="screen">
     <div class="content-pad">
       <div style="margin-bottom:20px;">
@@ -291,14 +286,12 @@ border-radius: 8px; font-weight: bold; margin-top: 10px; color: var(--text-dark)
     </div>
   </div>
 
-  <!-- Agencies -->
   <div id="agencies-screen" class="screen">
     <div class="content-pad">
       <div id="agency-list"></div>
     </div>
   </div>
 
-  <!-- Workbooks -->
   <div id="workbooks-screen" class="screen">
     <div class="content-pad">
       <div id="flashcard-container" class="flashcard-box">
@@ -314,7 +307,6 @@ border-radius: 8px; font-weight: bold; margin-top: 10px; color: var(--text-dark)
     </div>
   </div>
 
-  <!-- Vault -->
   <div id="wallet-screen" class="screen">
     <div class="content-pad">
       <div class="vault-section">
@@ -339,7 +331,6 @@ border-radius: 8px; font-weight: bold; margin-top: 10px; color: var(--text-dark)
     </div>
   </div>
 
-  <!-- Agent -->
   <div id="agent-screen" class="screen">
     <div class="content-pad">
       <div style="text-align:center; margin-bottom:20px;">
@@ -357,11 +348,9 @@ border-radius: 8px; font-weight: bold; margin-top: 10px; color: var(--text-dark)
     </div>
   </div>
 
-  <!-- Nav -->
   <div class="nav-bar" id="nav-bar"></div>
 </div>
 
-<!-- Overlays -->
 <div id="agency-viewer" style="display:none;">
   <div class="av-header">
     <span class="av-title" id="av-title">Agency Name</span>
@@ -463,7 +452,7 @@ const workbooks = [
 
 // --- App entry (no login) ---
 function enterApp(mode) {
-  document.getElementById('main-app').style.display = 'flex';
+  // We no longer need to set display: flex here if we removed display:none from the HTML
   const nav = document.getElementById('nav-bar');
   hideAllOverlays();
 
@@ -686,4 +675,4 @@ window.onload = () => {
 };
 </script>
 </body>
-  </html>
+</html>
