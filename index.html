@@ -1,727 +1,683 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8">
-  <title>Yellow Brick Road</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8">
+<title>Yellow Brick Road</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Icons / Map -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-  <!-- Icons / Map -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+:root {
+  --gold-shine: linear-gradient(135deg, #ffd700 0%, #ffecb3 25%, #ffc107 50%, #ffb300 75%, #ffd700 100%);
+  --cream-flat: #fbfbf8;
+  --text-dark: #3e2723;
+  --emerald: #00c853;
+  --ruby: #d50000;
+  --amber: #ffc107;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--cream-flat);
+  color: var(--text-dark);
+  margin: 0; padding: 0;
+  display: flex; flex-direction: column;
+  height: 100vh; overflow: hidden;
+}
+button { cursor: pointer; }
 
-  <style>
-    :root {
-      --gold-shine: linear-gradient(135deg, #ffd700 0%, #ffecb3 25%, #ffc107 50%, #ffb300 75%, #ffd700 100%);
-      --cream-flat: #fbfbf8;
-      --text-dark: #3e2723;
-      --emerald: #00c853;
-      --ruby: #d50000;
-      --amber: #ffc107;
-    }
-    * { box-sizing: border-box; }
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: var(--cream-flat);
-      color: var(--text-dark);
-      margin: 0; padding: 0;
-      display: flex; flex-direction: column;
-      height: 100vh; overflow: hidden;
-    }
-    button { cursor: pointer; }
+/* Header */
+.header {
+  padding: 15px 20px; background: linear-gradient(180deg, #ffc107 0%, #ffca28 50%, #ffc107 100%);
+  border-bottom: 4px solid #b78900; display: flex; justify-content: space-between; align-items: center;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1); z-index: 100;
+}
+h1 { color: var(--text-dark); font-size: 1.4rem; margin: 0; font-weight: 900; text-transform: uppercase; text-shadow: 0 1px 0 rgba(255,255,255,0.6); }
 
-    /* Landing / Login */
-    #landing-screen, #login-screen {
-      position: absolute; top:0; left:0; width:100%; height:100%;
-      background: radial-gradient(circle at center, #243447 0%, #000 100%);
-      z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center;
-      color: white; text-align: center;
-    }
-    #login-screen { display: none; }
-    .ybr-logo { margin-bottom: 20px; filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.6)); }
-    .landing-btn {
-      width: 85%; padding: 18px; margin: 10px; background: var(--gold-shine); border: 1px solid white; border-radius: 30px;
-      color: var(--text-dark); font-weight: 900; font-size: 1.1rem; text-transform: uppercase; box-shadow: 0 4px 15px rgba(255, 193, 7, 0.4);
-    }
-    .login-input {
-      width: 80%; padding: 15px; margin: 10px 0; border-radius: 10px; border: 2px solid #ffc107; font-size: 1rem;
-    }
-    .login-btn {
-      width: 80%; padding: 15px; margin-top: 20px; background: var(--gold-shine); color: var(--text-dark);
-      font-weight: bold; border: none; border-radius: 30px; font-size: 1.1rem;
-    }
-    .back-link { color: #ffecb3; margin-top: 20px; text-decoration: underline; cursor: pointer; }
+.status-badge {
+  background: white; color: var(--emerald); padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; border: 2px solid var(--emerald);
+}
+.live-dot {
+  height: 8px; width: 8px; background-color: var(--emerald); border-radius: 50%; display: inline-block; margin-right: 5px; animation: pulse 1.5s infinite;
+}
+@keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
 
-    /* Header */
-    .header {
-      padding: 15px 20px; background: linear-gradient(180deg, #ffc107 0%, #ffca28 50%, #ffc107 100%);
-      border-bottom: 4px solid #b78900; display: flex; justify-content: space-between; align-items: center;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1); z-index: 100;
-    }
-    h1 { color: var(--text-dark); font-size: 1.4rem; margin: 0; font-weight: 900; text-transform: uppercase; text-shadow: 0 1px 0 rgba(255,255,255,0.6); }
-    .status-badge {
-      background: white; color: var(--emerald); padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 800; border: 2px solid var(--emerald);
-    }
-    .live-dot {
-      height: 8px; width: 8px; background-color: var(--emerald); border-radius: 50%; display: inline-block; margin-right: 5px; animation: pulse 1.5s infinite;
-    }
-    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+/* Screens */
+.screen { flex: 1; overflow-y: auto; display: none; padding: 0; background: var(--cream-flat); }
+.screen.active { display: flex; flex-direction: column; }
+.content-pad { padding: 20px; }
 
-    /* Screens */
-    .screen { flex: 1; overflow-y: auto; display: none; padding: 0; background: var(--cream-flat); }
-    .screen.active { display: flex; flex-direction: column; }
-    .content-pad { padding: 20px; }
+/* Portal / cards */
+.card { background: white; padding: 15px; border-radius: 12px; margin-bottom: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-left: 5px solid #ccc; cursor: pointer; position: relative; }
+.card.recommended { border-left-color: #007bff; background-color: #f8fbff; order: -1; }
+.rec-badge { position: absolute; top: 10px; right: 10px; background: #007bff; color: white; font-size: 0.6rem; font-weight: bold; padding: 3px 8px; border-radius: 10px; display: none; }
+.card.recommended .rec-badge { display: block; }
 
-    /* Portal / cards */
-    .card { background: white; padding: 15px; border-radius: 12px; margin-bottom: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-left: 5px solid #ccc; cursor: pointer; position: relative; }
-    .card.recommended { border-left-color: #007bff; background-color: #f8fbff; order: -1; }
-    .rec-badge { position: absolute; top: 10px; right: 10px; background: #007bff; color: white; font-size: 0.6rem; font-weight: bold; padding: 3px 8px; border-radius: 10px; display: none; }
-    .card.recommended .rec-badge { display: block; }
-    .live-status { display: inline-block; font-size: 0.75rem; font-weight: bold; padding: 4px 8px; border-radius: 4px; margin-top: 5px; }
-    .status-green { background-color: #d4edda; color: #155724; }
-    .status-yellow { background-color: #fff3cd; color: #856404; }
-    .status-red { background-color: #f8d7da; color: #721c24; }
-    .card-title { font-weight: bold; font-size: 1rem; color: #333; margin-bottom: 4px; }
-    .card-desc { font-size: 0.85rem; color: #666; }
-    .card-icon { float: left; width: 45px; height: 45px; border-radius: 50%; background: #eee; display: flex; align-items: center; justify-content: center; margin-right: 15px; color: #555; font-size: 1.2rem; flex-shrink: 0; }
+.live-status { display: inline-block; font-size: 0.75rem; font-weight: bold; padding: 4px 8px; border-radius: 4px; margin-top: 5px; }
+.status-green { background-color: #d4edda; color: #155724; }
+.status-yellow { background-color: #fff3cd; color: #856404; }
+.status-red { background-color: #f8d7da; color: #721c24; }
+.card-title { font-weight: bold; font-size: 1rem; color: #333; margin-bottom: 4px; }
+.card-desc { font-size: 0.85rem; color: #666; }
 
-    /* Agency viewer */
-    #agency-viewer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--cream-flat); z-index: 250; display: none; flex-direction: column; }
-    .av-header { background: white; padding: 20px; border-bottom: 1px solid #ddd; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-    .av-title { font-weight: 900; font-size: 1.2rem; color: var(--text-dark); }
-    .av-content { flex: 1; padding: 20px; overflow-y: auto; }
-    .av-module { background: white; border-radius: 10px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid #eee; }
-    .av-label { font-size: 0.8rem; color: #886; font-weight: 800; text-transform: uppercase; }
-    .av-big-text { font-size: 1.4rem; font-weight: 900; margin-top: 5px; }
+.card-icon { float: left; width: 45px; height: 45px; border-radius: 50%; background: #eee; display: flex; align-items: center; justify-content: center; margin-right: 15px; color: #555; font-size: 1.2rem; flex-shrink: 0; }
 
-    .av-btn { width: 100%; padding: 12px; background: var(--gold-shine); border: none; border-radius: 8px; font-weight: bold; margin-top: 10px; color: var(--text-dark); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+/* Agency viewer */
+#agency-viewer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--cream-flat); z-index: 250; display: none; flex-direction: column; }
+.av-header { background: white; padding: 20px; border-bottom: 1px solid #ddd; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+.av-title { font-weight: 900; font-size: 1.2rem; color: var(--text-dark); }
+.av-content { flex: 1; padding: 20px; overflow-y: auto; }
+.av-module { background: white; border-radius: 10px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid #eee; }
+.av-label { font-size: 0.8rem; color: #886; font-weight: 800; text-transform: uppercase; }
+.av-big-text { font-size: 1.4rem; font-weight: 900; margin-top: 5px; }
+.av-btn { width: 100%; padding: 12px; background: var(--gold-shine); border: none; border-radius: 8px; font-weight: bold; margin-top: 10px; color: var(--text-dark); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
 
-    /* Chat */
-    #chat-container {
-      flex: 1;
-      overflow-y: auto;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-      margin-bottom: 120px; /* space for input + nav */
-    }
-    .message { padding: 12px 18px; border-radius: 18px; max-width: 85%; word-wrap: break-word; }
-    .bot-message { background-color: white; align-self: flex-start; border: 1px solid #eee; }
-    .user-message { background: var(--gold-shine); color: var(--text-dark); align-self: flex-end; font-weight: 600; }
-    .input-area {
-      position: fixed;
-      bottom: 55px; /* sits above nav-bar */
-      left: 0;
-      width: 100%;
-      padding: 10px;
-      background: white;
-      display: flex;
-      gap: 10px;
-      border-top: 1px solid #eee;
-      z-index: 300;
-    }
-    .input-area input {
-      flex-grow: 1;
-      padding: 12px 15px;
-      border: 1px solid #ddd;
-      border-radius: 25px;
-      outline: none;
-      background: #f9f9f9;
-    }
-    .send-btn {
-      background: var(--gold-shine);
-      color: var(--text-dark);
-      border: none;
-      padding: 0 24px;
-      border-radius: 25px;
-      font-weight: bold;
-    }
+/* Chat */
+#chat-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 120px; /* space for input + nav */
+}
+.message { padding: 12px 18px; border-radius: 18px; max-width: 85%; word-wrap: break-word; }
+.bot-message { background-color: white; align-self: flex-start; border: 1px solid #eee; }
+.user-message { background: var(--gold-shine); color: var(--text-dark); align-self: flex-end; font-weight: 600; }
+.input-area {
+  position: fixed;
+  bottom: 55px; /* sits above nav-bar */
+  left: 0;
+  width: 100%;
+  padding: 10px;
+  background: white;
+  display: flex;
+  gap: 10px;
+  border-top: 1px solid #eee;
+  z-index: 300;
+}
+.input-area input {
+  flex-grow: 1;
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+  border-radius: 25px;
+  outline: none;
+  background: #f9f9f9;
+}
+.send-btn {
+  background: var(--gold-shine);
+  color: var(--text-dark);
+  border: none;
+  padding: 0 24px;
+  border-radius: 25px;
+  font-weight: bold;
+}
 
-    /* Nav bar */
-    .nav-bar {
-      background: linear-gradient(180deg, #ffc107 0%, #ffca28 100%);
-      border-top: 3px solid #b78900;
-      display: flex;
-      justify-content: space-evenly;
-      padding: 8px 5px;
-      position: fixed;
-      bottom: 0;
-      width: 100%;
-      z-index: 200;
-    }
-    .nav-item {
-      text-align: center;
-      color: var(--text-dark);
-      opacity: 0.6;
-      background: none;
-      border: none;
-      font-size: 0.65rem;
-      font-weight: 700;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 0 1px;
-      min-width: 16%;
-    }
-    .nav-item.active {
-      opacity: 1;
-      transform: translateY(-2px);
-      text-shadow: 0 1px 0 rgba(255,255,255,0.5);
-    }
-    .nav-item i {
-      display: block;
-      font-size: 1.2rem;
-      margin-bottom: 2px;
-    }
+/* Nav bar */
+.nav-bar {
+  background: linear-gradient(180deg, #ffc107 0%, #ffca28 100%);
+  border-top: 3px solid #b78900;
+  display: flex;
+  justify-content: space-evenly;
+  padding: 8px 5px;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  z-index: 200;
+}
+.nav-item {
+  text-align: center;
+  color: var(--text-dark);
+  opacity: 0.6;
+  background: none;
+  border: none;
+  font-size: 0.65rem;
+  font-weight: 700;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 1px;
+  min-width: 16%;
+}
+.nav-item.active {
+  opacity: 1;
+  transform: translateY(-2px);
+  text-shadow: 0 1px 0 rgba(255,255,255,0.5);
+}
+.nav-item i {
+  display: block;
+  font-size: 1.2rem;
+  margin-bottom: 2px;
+}
 
-    /* Categories */
-    .category-header {
-      font-size: 0.9rem; color: #8a6d3b; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;
-      margin-top: 20px; margin-bottom: 10px; border-bottom: 2px solid #ffc107; padding-bottom: 5px;
-    }
+/* Categories */
+.category-header {
+  font-size: 0.9rem; color: #8a6d3b; font-weight: 800; text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 20px; margin-bottom: 10px; border-bottom: 2px solid #ffc107; padding-bottom: 5px;
+}
 
-    /* Vault */
-    .vault-section { margin-bottom: 30px; }
-    .vault-header {
-      font-size: 0.9rem; color: #8a6d3b; font-weight: 800; text-transform: uppercase; margin-bottom: 15px;
-      border-bottom: 2px solid #e0d0b8; padding-bottom: 5px; display: flex; justify-content: space-between; align-items: center;
-    }
-    .wallet-item { background: linear-gradient(135deg, #fff, #f9f9f9); border-radius: 10px; padding: 15px; margin-bottom: 10px; border: 1px solid #ddd; box-shadow: 0 2px 5px rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: space-between; }
-    .wallet-badge { font-size: 0.7rem; background: #e8f5e9; color: var(--emerald); padding: 3px 8px; border-radius: 10px; font-weight: bold; border: 1px solid var(--emerald); }
+/* Vault */
+.vault-section { margin-bottom: 30px; }
+.vault-header {
+  font-size: 0.9rem; color: #8a6d3b; font-weight: 800; text-transform: uppercase;
+  margin-bottom: 15px;
+  border-bottom: 2px solid #e0d0b8; padding-bottom: 5px; display: flex; justify-content:
+  space-between; align-items: center;
+}
+.wallet-item { background: linear-gradient(135deg, #fff, #f9f9f9); border-radius: 10px; padding:
+  15px; margin-bottom: 10px; border: 1px solid #ddd; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  display: flex; align-items: center; justify-content: space-between; }
+.wallet-badge { font-size: 0.7rem; background: #e8f5e9; color: var(--emerald); padding: 3px
+  8px; border-radius: 10px; font-weight: bold; border: 1px solid var(--emerald); }
 
-    /* Agent dashboard */
-    .dashboard-stat { background: white; padding: 20px; border-radius: 15px; margin-bottom: 15px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-    .stat-num { font-size: 3rem; font-weight: 900; color: #ffb300; }
-    .control-row { display: flex; justify-content: center; gap: 20px; margin-top: 10px; }
-    .ctrl-btn { width: 45px; height: 45px; border-radius: 50%; border: none; font-size: 1.5rem; font-weight: bold; }
-    .btn-minus { background: white; color: var(--ruby); border: 2px solid var(--ruby); }
-    .btn-plus { background: white; color: var(--emerald); border: 2px solid var(--emerald); }
+/* Agent dashboard */
+.dashboard-stat { background: white; padding: 20px; border-radius: 15px; margin-bottom:
+  15px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+.stat-num { font-size: 3rem; font-weight: 900; color: #ffb300; }
+.control-row { display: flex; justify-content: center; gap: 20px; margin-top: 10px; }
+.ctrl-btn { width: 45px; height: 45px; border-radius: 50%; border: none; font-size: 1.5rem;
+  font-weight: bold; }
+.btn-minus { background: white; color: var(--ruby); border: 2px solid var(--ruby); }
+.btn-plus { background: white; color: var(--emerald); border: 2px solid var(--emerald); }
 
-    /* Map */
-    #map-controls { padding: 10px; background: white; border-bottom: 1px solid #ddd; }
-    .day-btn { background: #f5f5f5; border: 1px solid #ccc; padding: 8px 18px; border-radius: 20px; margin-right: 8px; font-weight: bold; color: #666; }
-    .day-btn.active { background: var(--gold-shine); color: var(--text-dark); border: 1px solid #b78900; }
-    #map-frame { flex: 1; width: 100%; min-height: 300px; z-index: 1; }
-    #directory-list { background: white; max-height: 250px; overflow-y: auto; border-top: 4px solid #ffca28; }
-    .dir-item { padding: 15px; border-bottom: 1px solid #eee; display: flex; align-items: center; }
-    .dir-icon { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px; font-size: 1.2rem; color: white; flex-shrink: 0; }
+/* Map */
+#map-controls { padding: 10px; background: white; border-bottom: 1px solid #ddd; }
+.day-btn { background: #f5f5f5; border: 1px solid #ccc; padding: 8px 18px; border-radius:
+  20px; margin-right: 8px; font-weight: bold; color: #666; }
+.day-btn.active { background: var(--gold-shine); color: var(--text-dark); border: 1px solid
+  #b78900; }
+#map-frame { flex: 1; width: 100%; min-height: 300px; z-index: 1; }
+#directory-list { background: white; max-height: 250px; overflow-y: auto; border-top: 4px solid
+  #ffca28; }
+.dir-item { padding: 15px; border-bottom: 1px solid #eee; display: flex; align-items: center; }
+.dir-icon { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center;
+  justify-content: center; margin-right: 15px; font-size: 1.2rem; color: white; flex-shrink: 0; }
 
-    /* Workbooks / Academy */
-    .flashcard-box { background: linear-gradient(135deg, #2c3e50, #4ca1af); padding: 20px; border-radius: 15px; color: white; margin-bottom: 25px; text-align: center; }
-    .fc-btn { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.5); color: white; padding: 8px 20px; border-radius: 20px; margin: 0 5px; }
+/* Workbooks / Academy */
+.flashcard-box { background: linear-gradient(135deg, #2c3e50, #4ca1af); padding: 20px;
+  border-radius: 15px; color: white; margin-bottom: 25px; text-align: center; }
+.fc-btn { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.5); color:
+  white; padding: 8px 20px; border-radius: 20px; margin: 0 5px; }
+.doc-status { font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; }
+.verified { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
 
-    .doc-status { font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; }
-    .verified { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+/* Lesson viewer */
+#lesson-viewer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background:
+  #fbfbf8; z-index: 300; display: none; flex-direction: column; }
+.viewer-content { flex: 1; padding: 20px; overflow-y: auto; }
+.intel-box { background: #fffde7; color: #5d4037; padding: 15px; border-radius: 8px;
+  margin-bottom: 20px; border-left: 4px solid #ffc107; }
 
-    /* Lesson viewer */
-    #lesson-viewer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #fbfbf8; z-index: 300; display: none; flex-direction: column; }
-    .viewer-content { flex: 1; padding: 20px; overflow-y: auto; }
-    .intel-box { background: #fffde7; color: #5d4037; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #ffc107; }
-
-    /* Art Studio */
-    #art-studio { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.2); z-index: 350; flex-direction: column; }
-    .studio-header { background: #fff; padding: 10px 15px; display:flex; justify-content: space-between; align-items:center; border-bottom: 1px solid #eee; }
-    #canvas-wrapper { flex:1; background:#fff; }
-    .studio-toolbar { background:#fff; padding:10px; border-top:1px solid #eee; }
-    .tool-row { display:flex; gap:8px; }
-    .tool-btn { padding:6px 10px; border:1px solid #ccc; background:#f7f7f7; border-radius:6px; }
-    .tool-btn.active { border-color:#ffc107; }
-  </style>
+/* Art Studio */
+#art-studio { display: none; position: fixed; top:0; left:0; width:100%; height: 100%;
+  background: rgba(0,0,0,0.2); z-index: 350; flex-direction: column; }
+.studio-header { background: #fff; padding: 10px 15px; display:flex; justify-content:
+  space-between; align-items:center; border-bottom: 1px solid #eee; }
+#canvas-wrapper { flex:1; background:#fff; }
+.studio-toolbar { background:#fff; padding: 10px; border-top:1px solid #eee; }
+.tool-row { display:flex; gap:8px; }
+.tool-btn { padding:6px 10px; border: 1px solid #ccc; background:#f7f7f7; border-radius:6px; }
+.tool-btn.active { border-color:#ffc107; }
+</style>
 </head>
 <body>
 
-  <!-- Landing -->
-  <div id="landing-screen">
-    <svg class="ybr-logo" width="180" height="180" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <radialGradient id="skyGlow" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" style="stop-color:#81d4fa;stop-opacity:1"/>
-          <stop offset="100%" style="stop-color:#01579b;stop-opacity:1"/>
-        </radialGradient>
-        <linearGradient id="roadGold" x1="0%" y1="100%" x2="0%" y2="0%">
-          <stop offset="0%" style="stop-color:#ffd700;stop-opacity:1"/>
-          <stop offset="100%" style="stop-color:#fff176;stop-opacity:1"/>
-        </linearGradient>
-      </defs>
-      <circle cx="100" cy="100" r="95" fill="url(#skyGlow)" stroke="#ffd700" stroke-width="5" />
-      <path d="M 80 100 L 90 60 L 100 90 L 110 50 L 120 90 L 130 70 L 140 100 Z" fill="#00e676" opacity="0.9" />
-      <path d="M 100 100 L 140 180 Q 100 190 60 180 Z" fill="url(#roadGold)" stroke="#f57f17" stroke-width="1" />
-      <path d="M 90 120 L 110 120 M 80 140 L 120 140 M 70 160 L 130 160" stroke="#f9a825" stroke-width="1" fill="none" />
-    </svg>
-    <h1 style="color:#fff; font-size:2.0rem; margin-bottom:10px; text-transform:uppercase; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">Yellow Brick Road</h1>
-    <p style="color:#ffc107; margin-bottom:40px; font-weight:bold; font-size:1.1rem; text-shadow: 0 1px 2px rgba(0,0,0,0.8);">Navigating Homelessness, Together.</p>
-    <button class="landing-btn" onclick="showLogin('member')"><i class="fas fa-user"></i> Member Login</button>
-    <button class="landing-btn" onclick="showLogin('agent')"><i class="fas fa-building"></i> Agent Access</button>
+<!-- Main App -->
+<div id="main-app" style="display:none; height:100%; flex-direction:column;">
+  <div class="header">
+    <h1 id="page-title">Yellow Brick Road</h1>
+    <div class="status-badge" onclick="location.reload()"><span class="live-dot"></span>Live Network</div>
   </div>
 
-  <!-- Login -->
-  <div id="login-screen">
-    <h2 style="color:#ffc107; margin-bottom:20px; text-transform:uppercase; font-weight:900;" id="login-title">Login</h2>
-    <input type="text" id="username" class="login-input" placeholder="Username">
-    <input type="password" id="password" class="login-input" placeholder="Password">
-    <button class="login-btn" onclick="attemptLogin()">Sign In</button>
-    <div class="back-link" onclick="location.reload()">Back to Selection</div>
-    <div style="margin-top:30px; color:#ccc; font-size:0.8rem; background:rgba(0,0,0,0.4); padding:15px; border-radius:10px;">
-      Demo Defaults:<br>
-      Member: <b>Member</b> / <b>Passw0rd</b><br>
-      Agent: <b>Agent</b> / <b>Passw0rd</b>
+  <!-- Chat -->
+  <div id="chat-screen" class="screen active">
+    <div id="chat-container">
+      <div class="message bot-message">Hello. I am Brick. Think of me as a partner on your journey home. Tell me what's going on, and we will handle it together.</div>
+    </div>
+    <div class="input-area">
+      <input type="text" id="user-input" placeholder="Type here..." onkeydown="handleEnterChat(event)">
+      <button class="send-btn" onclick="sendChatMessage()">Send</button>
     </div>
   </div>
 
-  <!-- Main App -->
-  <div id="main-app" style="display:none; height:100%; flex-direction:column;">
-    <div class="header">
-      <h1 id="page-title">Yellow Brick Road</h1>
-      <div class="status-badge" onclick="location.reload()"><span class="live-dot"></span>Live Network</div>
+  <!-- Map -->
+  <div id="map-screen" class="screen">
+    <div id="map-controls">
+      <button class="day-btn" onclick="filterMap('Mon')">Mon</button>
+      <button class="day-btn active" onclick="filterMap('All')">All</button>
     </div>
-
-    <!-- Chat -->
-    <div id="chat-screen" class="screen active">
-      <div id="chat-container">
-        <div class="message bot-message">Hello. I am Brick. Think of me as a partner on your journey home. Tell me what's going on, and we will handle it together.</div>
-      </div>
-      <div class="input-area">
-        <input type="text" id="user-input" placeholder="Type here..." onkeydown="handleEnterChat(event)">
-        <button class="send-btn" onclick="sendChatMessage()">Send</button>
-      </div>
-    </div>
-
-    <!-- Map -->
-    <div id="map-screen" class="screen">
-      <div id="map-controls">
-        <button class="day-btn" onclick="filterMap('Mon')">Mon</button>
-        <button class="day-btn active" onclick="filterMap('All')">All</button>
-      </div>
-      <div id="map-frame"></div>
-      <div id="directory-list"></div>
-    </div>
-
-    <!-- Portal -->
-    <div id="portal-screen" class="screen">
-      <div class="content-pad">
-        <div style="margin-bottom:20px;">
-          <div style="font-size:1.5rem; font-weight:900; color:var(--text-dark);">Good Morning, Nitra</div>
-          <div style="color:#886; font-size:0.9rem;">Today's Overview</div>
-        </div>
-        <div class="card" style="background:#f0fff4; border-left-color:var(--emerald);">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <div>
-              <div class="card-title" style="margin:0;">The Shade Tree</div>
-              <div class="card-desc">Live Status</div>
-            </div>
-            <div style="text-align:right;">
-              <span style="font-size:1.5rem; font-weight:bold; color:var(--emerald);" id="portal-bed-count">3</span>
-              <div style="font-size:0.7rem; font-weight:bold; color:var(--emerald);">BEDS OPEN</div>
-            </div>
-          </div>
-        </div>
-        <div style="font-size:0.8rem; color:#886; font-weight:800; margin-bottom:10px; text-transform:uppercase;">My Active Statuses</div>
-        <div class="card">
-          <div class="card-content">
-            <b>SNAP (Welfare)</b><br><span style="font-size:0.8rem; color:#666;">Application Pending</span>
-          </div>
-          <div style="font-weight:bold; color:#f0ad4e;">Under Review</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Agencies -->
-    <div id="agencies-screen" class="screen">
-      <div class="content-pad">
-        <div id="agency-list"></div>
-      </div>
-    </div>
-
-    <!-- Workbooks -->
-    <div id="workbooks-screen" class="screen">
-      <div class="content-pad">
-        <div id="flashcard-container" class="flashcard-box">
-          <div style="font-size:0.8rem; opacity:0.8;">ASSESSMENT</div>
-          <div style="font-size:1.1rem; font-weight:bold; margin:15px 0;" id="fc-text">Do you have a pet?</div>
-          <div><button class="fc-btn" onclick="answerFlashcard('yes')">Yes</button><button class="fc-btn" onclick="answerFlashcard('no')">No</button></div>
-        </div>
-        <div style="font-size:0.8rem; color:#999; font-weight:bold; margin-bottom:10px;">RECOMMENDED GUIDES</div>
-        <div id="academy-list"></div>
-      </div>
-    </div>
-
-    <!-- Vault -->
-    <div id="wallet-screen" class="screen">
-      <div class="content-pad">
-        <div class="vault-section">
-          <div class="vault-header"><span><i class="fas fa-wallet"></i> My Wallet</span> <i class="fas fa-lock" style="color:var(--emerald);"></i></div>
-          <div class="wallet-item">
-            <div style="display:flex; align-items:center;">
-              <i class="fas fa-id-card wallet-icon" style="font-size:1.5rem; margin-right:15px; color:#555;"></i>
-              <div><b>State ID</b><br><span style="font-size:0.7rem; color:#666;">Nevada</span></div>
-            </div>
-            <span class="wallet-badge">VERIFIED</span>
-          </div>
-        </div>
-        <div class="vault-section">
-          <div class="vault-header"><span><i class="fas fa-folder-open"></i> Paperwork</span></div>
-          <div class="wallet-item" style="border-left:none;">
-            <div style="display:flex; align-items:center;">
-              <i class="fas fa-file-pdf wallet-icon" style="font-size:1.5rem; margin-right:15px; color:#fbc02d;"></i>
-              <b>Housing_App.pdf</b>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Agent -->
-    <div id="agent-screen" class="screen">
-      <div class="content-pad">
-        <div style="text-align:center; margin-bottom:20px;">
-          <h2 style="margin:0;">The Shade Tree</h2>
-          <span style="color:#00c853; font-weight:bold;">● System Online</span>
-        </div>
-        <div class="dashboard-stat">
-          <div style="color:#886; font-size:0.9rem; font-weight:bold;">LIVE KENNEL CAPACITY</div>
-          <div class="stat-num" id="bed-count-display">3</div>
-          <div class="control-row">
-            <button class="ctrl-btn btn-minus" onclick="updateBeds(-1)">-</button>
-            <button class="ctrl-btn btn-plus" onclick="updateBeds(1)">+</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Nav -->
-    <div class="nav-bar" id="nav-bar"></div>
+    <div id="map-frame"></div>
+    <div id="directory-list"></div>
   </div>
 
-  <!-- Overlays -->
-  <div id="agency-viewer" style="display:none;">
-    <div class="av-header">
-      <span class="av-title" id="av-title">Agency Name</span>
-      <button onclick="closeAgency()" style="border:none; background:none; font-size:1.5rem;">&times;</button>
-    </div>
-    <div class="av-content" id="av-body"></div>
-  </div>
-
-  <div id="lesson-viewer" style="display:none;">
-    <div style="padding:15px; display:flex; justify-content:space-between; background:#ffc107;">
-      <span id="view-title" style="font-weight:bold;">Guide</span>
-      <button onclick="document.getElementById('lesson-viewer').style.display='none'">X</button>
-    </div>
-    <div class="viewer-content" id="viewer-body"></div>
-  </div>
-
-  <div id="art-studio">
-    <div class="studio-header">
-      <span><i class="fas fa-palette"></i> Creative Studio</span>
-      <button onclick="closeStudio()" style="background:red; color:white; border:none; padding:5px 10px;">X</button>
-    </div>
-    <div id="canvas-wrapper"><canvas id="drawing-canvas" width="800" height="600"></canvas></div>
-    <div class="studio-toolbar">
-      <div class="tool-row">
-        <button class="tool-btn active" onclick="setTool('pencil')">Pencil</button>
-        <button class="tool-btn" onclick="setTool('eraser')">Eraser</button>
-        <button class="tool-btn" onclick="setTool('line')">Line</button>
+  <!-- Portal -->
+  <div id="portal-screen" class="screen">
+    <div class="content-pad">
+      <div style="margin-bottom:20px;">
+        <div style="font-size:1.5rem; font-weight:900; color:var(--text-dark);">Good Morning, Nitra</div>
+        <div style="color:#886; font-size:0.9rem;">Today's Overview</div>
+      </div>
+      <div class="card" style="background:#f0fff4; border-left-color:var(--emerald);">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <div class="card-title" style="margin:0;">The Shade Tree</div>
+            <div class="card-desc">Live Status</div>
+          </div>
+          <div style="text-align:right;">
+            <span style="font-size:1.5rem; font-weight:bold; color:var(--emerald);" id="portal-bed-count">3</span>
+            <div style="font-size:0.7rem; font-weight:bold; color:var(--emerald);">BEDS OPEN</div>
+          </div>
+        </div>
+      </div>
+      <div style="font-size:0.8rem; color:#886; font-weight:800; margin-bottom:10px; text-transform:uppercase;">My Active Statuses</div>
+      <div class="card">
+        <div class="card-content">
+          <b>SNAP (Welfare)</b><br><span style="font-size:0.8rem; color:#666;">Application Pending</span>
+        </div>
+        <div style="font-weight:bold; color:#f0ad4e;">Under Review</div>
       </div>
     </div>
   </div>
 
-  <script>
-    // --- Global state ---
-    var userProfile = { hasPet: false, isVeteran: false, hasLegalIssues: false, noID: false };
-    var bedCount = 3;
-    var lastContext = "";
-    var map;
+  <!-- Agencies -->
+  <div id="agencies-screen" class="screen">
+    <div class="content-pad">
+      <div id="agency-list"></div>
+    </div>
+  </div>
 
-    // --- Data ---
-    const agencies = [
-      {
-        id: "snap", cat: "Welfare & Benefits", name: "SNAP (Welfare)", desc: "Food Assistance", tags: ["all"], icon: "fas fa-utensils",
-        render: () => `
-          <div class="av-module">
-            <h3>Benefit Status</h3>
-            <p>Next Deposit: 5th of Month</p>
+  <!-- Workbooks -->
+  <div id="workbooks-screen" class="screen">
+    <div class="content-pad">
+      <div id="flashcard-container" class="flashcard-box">
+        <div style="font-size:0.8rem; opacity:0.8;">ASSESSMENT</div>
+        <div style="font-size:1.1rem; font-weight:bold; margin:15px 0;" id="fc-text">Do you have a pet?</div>
+        <div>
+          <button class="fc-btn" onclick="answerFlashcard('yes')">Yes</button>
+          <button class="fc-btn" onclick="answerFlashcard('no')">No</button>
+        </div>
+      </div>
+      <div style="font-size:0.8rem; color:#999; font-weight:bold; margin-bottom:10px;">RECOMMENDED GUIDES</div>
+      <div id="academy-list"></div>
+    </div>
+  </div>
+
+  <!-- Vault -->
+  <div id="wallet-screen" class="screen">
+    <div class="content-pad">
+      <div class="vault-section">
+        <div class="vault-header"><span><i class="fas fa-wallet"></i> My Wallet</span> <i class="fas fa-lock" style="color:var(--emerald);"></i></div>
+        <div class="wallet-item">
+          <div style="display:flex; align-items:center;">
+            <i class="fas fa-id-card wallet-icon" style="font-size:1.5rem; margin-right:15px; color:#555;"></i>
+            <div><b>State ID</b><br><span style="font-size:0.7rem; color:#666;">Nevada</span></div>
           </div>
-        `
-      },
-      {
-        id: "shade", cat: "Housing & Shelter", name: "The Shade Tree", desc: "Women & Pets", tags: ["hasPet"], icon: "fas fa-paw",
-        render: () => `
-          <div class="av-module">
-            <span class="av-label">Live Availability</span>
-            <div class="av-big-text" style="color:#00c853;">${bedCount} Crates Open</div>
-            <p>We are accepting pets.</p>
+          <span class="wallet-badge">VERIFIED</span>
+        </div>
+      </div>
+      <div class="vault-section">
+        <div class="vault-header"><span><i class="fas fa-folder-open"></i> Paperwork</span></div>
+        <div class="wallet-item" style="border-left:none;">
+          <div style="display:flex; align-items:center;">
+            <i class="fas fa-file-pdf wallet-icon" style="font-size:1.5rem; margin-right:15px; color:#fbc02d;"></i>
+            <b>Housing_App.pdf</b>
           </div>
-        `
-      },
-      {
-        id: "legal", cat: "Legal & Courts", name: "Legal Aid Center", desc: "Warrant & Court Help", tags: ["hasLegalIssues"], icon: "fas fa-gavel",
-        render: () => `
-          <div class="av-module">
-            <h3>Self-Help Law</h3>
-            <button class="av-btn">File Motion</button>
-          </div>
-        `
-      },
-      {
-        id: "va", cat: "Veterans Services", name: "Veterans Affairs", desc: "CRRC & Housing", tags: ["isVeteran"], icon: "fas fa-flag-usa",
-        render: () => `
-          <div class="av-module">
-            <span class="av-label">Status</span>
-            <div class="av-big-text" style="color:#007bff;">Open</div>
-            <p>Walk-ins welcome.</p>
-          </div>
-        `
-      },
-      {
-        id: "dmv", cat: "Identity & Documents", name: "Project ID", desc: "Document Recovery", tags: ["noID"], icon: "fas fa-id-card",
-        render: () => `
-          <div class="av-module">
-            <h3>ID Vouchers</h3>
-            <div class="av-big-text">Active</div>
-          </div>
-        `
-      }
-    ];
+        </div>
+      </div>
+    </div>
+  </div>
 
-    const workbooks = [
-      { id: "pet", title: "K9 Safety", desc: "Toxic Foods", tags: ["hasPet"], intel: "No grapes or xylitol.", steps: ["Check food labels.", "Avoid certain snacks."] },
-      { id: "legal", title: "Warrants", desc: "Quashing Tickets", tags: ["hasLegalIssues"], intel: "Don't ignore fines.", steps: ["Call Court Clerk.", "Request a hearing."] }
-    ];
+  <!-- Agent -->
+  <div id="agent-screen" class="screen">
+    <div class="content-pad">
+      <div style="text-align:center; margin-bottom:20px;">
+        <h2 style="margin:0;">The Shade Tree</h2>
+        <span style="color:#00c853; font-weight:bold;">System Online</span>
+      </div>
+      <div class="dashboard-stat">
+        <div style="color:#886; font-size:0.9rem; font-weight:bold;">LIVE KENNEL CAPACITY</div>
+        <div class="stat-num" id="bed-count-display">3</div>
+        <div class="control-row">
+          <button class="ctrl-btn btn-minus" onclick="updateBeds(-1)">-</button>
+          <button class="ctrl-btn btn-plus" onclick="updateBeds(1)">+</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
-    // --- Landing / Login ---
-    var currentRole = "";
-    function showLogin(role) {
-      currentRole = role;
-      document.getElementById('landing-screen').style.display = 'none';
-      document.getElementById('login-screen').style.display = 'flex';
-      document.getElementById('login-title').innerText = role === 'member' ? 'Member Login' : 'Agent Access';
-      document.getElementById('username').value = "";
-      document.getElementById('password').value = "";
-    }
-    function attemptLogin() {
-      const u = document.getElementById('username').value; const p = document.getElementById('password').value;
-      if ((currentRole === 'member' && u === 'Member' && p === 'Passw0rd') ||
-          (currentRole === 'agent' && u === 'Agent' && p === 'Passw0rd')) {
-        document.getElementById('login-screen').style.display = 'none';
-        enterApp(currentRole);
-      } else {
-        alert("Invalid. Check demo defaults.");
-      }
-    }
-    function enterApp(mode) {
-      document.getElementById('main-app').style.display = 'flex';
-      const nav = document.getElementById('nav-bar');
-      hideAllOverlays();
+  <!-- Nav -->
+  <div class="nav-bar" id="nav-bar"></div>
+</div>
 
-      if (mode === 'agent') {
-        document.getElementById('page-title').innerText = "Agent Portal";
-        nav.innerHTML = `
-          <button class="nav-item active" data-tab="agent" onclick="switchTab('agent')"><i class="fas fa-shield-alt"></i> Agent</button>
-        `;
-        switchTab('agent');
-      } else {
-        document.getElementById('page-title').innerText = "Yellow Brick Road";
-        nav.innerHTML = `
-          <button class="nav-item active" data-tab="chat" onclick="switchTab('chat')"><i class="fas fa-comments"></i> Brick</button>
-          <button class="nav-item" data-tab="map" onclick="switchTab('map')"><i class="fas fa-map-marked-alt"></i> Map</button>
-          <button class="nav-item" data-tab="portal" onclick="switchTab('portal')"><i class="fas fa-columns"></i> Portal</button>
-          <button class="nav-item" data-tab="agencies" onclick="switchTab('agencies')"><i class="fas fa-building"></i> Agencies</button>
-          <button class="nav-item" data-tab="workbooks" onclick="switchTab('workbooks')"><i class="fas fa-graduation-cap"></i> Workbooks</button>
-          <button class="nav-item" data-tab="vault" onclick="switchTab('vault')"><i class="fas fa-wallet"></i> Vault</button>
-        `;
-        switchTab('chat');
-        renderAgencies();
-        renderWorkbooks();
-      }
-    }
+<!-- Overlays -->
+<div id="agency-viewer" style="display:none;">
+  <div class="av-header">
+    <span class="av-title" id="av-title">Agency Name</span>
+    <button onclick="closeAgency()" style="border:none; background:none; font-size:1.5rem;">&times;</button>
+  </div>
+  <div class="av-content" id="av-body"></div>
+</div>
 
-    // --- Utilities / overlays ---
-    function hideAllOverlays() {
-      document.getElementById('agency-viewer').style.display = 'none';
-      document.getElementById('lesson-viewer').style.display = 'none';
-      if (document.getElementById('art-studio')) document.getElementById('art-studio').style.display = 'none';
-    }
+<div id="lesson-viewer" style="display:none;">
+  <div style="padding: 15px; display:flex; justify-content:space-between; background:#ffc107;">
+    <span id="view-title" style="font-weight:bold;">Guide</span>
+    <button onclick="document.getElementById('lesson-viewer').style.display='none'">X</button>
+  </div>
+  <div class="viewer-content" id="viewer-body"></div>
+</div>
 
-    // --- Agent controls ---
-    function updateBeds(change) {
-      bedCount += change; if (bedCount < 0) bedCount = 0;
-      const agentDisplay = document.getElementById('bed-count-display');
-      const portalDisplay = document.getElementById('portal-bed-count');
-      if (agentDisplay) agentDisplay.innerText = bedCount;
-      if (portalDisplay) portalDisplay.innerText = bedCount;
-    }
+<div id="art-studio" style="display:none;">
+  <div class="studio-header">
+    <span><i class="fas fa-palette"></i> Creative Studio</span>
+    <button onclick="closeStudio()" style="background:red; color:white; border:none; padding:5px 10px;">X</button>
+  </div>
+  <div id="canvas-wrapper"><canvas id="drawing-canvas" width="800" height="600"></canvas></div>
+  <div class="studio-toolbar">
+    <div class="tool-row">
+      <button class="tool-btn active" onclick="setTool('pencil')">Pencil</button>
+      <button class="tool-btn" onclick="setTool('eraser')">Eraser</button>
+      <button class="tool-btn" onclick="setTool('line')">Line</button>
+    </div>
+  </div>
+</div>
 
-    // --- Agency viewer ---
-    function openAgency(id) {
-      const agency = agencies.find(a => a.id === id);
-      if (!agency) return;
-      document.getElementById('av-title').innerText = agency.name;
-      document.getElementById('av-body').innerHTML = agency.render();
-      document.getElementById('agency-viewer').style.display = 'flex';
-    }
-    function closeAgency() { document.getElementById('agency-viewer').style.display = 'none'; }
+<script>
+// --- Global state ---
+var userProfile = { hasPet: false, isVeteran: false, hasLegalIssues: false, noID: false };
+var bedCount = 3;
+var lastContext = "";
+var map;
 
-    // --- Agencies list render ---
-    function renderAgencies() {
-      const list = document.getElementById('agency-list'); if (!list) return;
-      list.innerHTML = "";
-      const categories = ["Welfare & Benefits", "Housing & Shelter", "Legal & Courts", "Veterans Services", "Identity & Documents"];
-      categories.forEach(cat => {
-        const catAgencies = agencies.filter(a => a.cat === cat);
-        if (catAgencies.length > 0) {
-          list.innerHTML += `
-            <div class="category-header">${cat}</div>
-          `;
-          catAgencies.forEach(a => {
-            list.innerHTML += `
-              <div class="card recommended" onclick="openAgency('${a.id}')">
-                <div class="rec-badge">OPEN</div>
-                <div class="card-icon"><i class="${a.icon}"></i></div>
-                <div class="card-content">
-                  <div class="card-title">${a.name}</div>
-                  <div class="card-desc">${a.desc}</div>
-                </div>
-              </div>
-            `;
-          });
-        }
-      });
-    }
+// --- Data ---
+const agencies = [
+  {
+    id: "snap", cat: "Welfare & Benefits", name: "SNAP (Welfare)", desc: "Food Assistance",
+    tags: ["all"], icon: "fas fa-utensils",
+    render: () => `
+      <div class="av-module">
+        <h3>Benefit Status</h3>
+        <p>Next Deposit: 5th of Month</p>
+      </div>
+    `
+  },
+  {
+    id: "shade", cat: "Housing & Shelter", name: "The Shade Tree", desc: "Women & Pets",
+    tags: ["hasPet"], icon: "fas fa-paw",
+    render: () => `
+      <div class="av-module">
+        <span class="av-label">Live Availability</span>
+        <div class="av-big-text" style="color:#00c853;">${bedCount} Crates Open</div>
+        <p>We are accepting pets.</p>
+      </div>
+    `
+  },
+  {
+    id: "legal", cat: "Legal & Courts", name: "Legal Aid Center", desc: "Warrant & Court Help",
+    tags: ["hasLegalIssues"], icon: "fas fa-gavel",
+    render: () => `
+      <div class="av-module">
+        <h3>Self-Help Law</h3>
+        <button class="av-btn">File Motion</button>
+      </div>
+    `
+  },
+  {
+    id: "va", cat: "Veterans Services", name: "Veterans Affairs", desc: "CRRC & Housing",
+    tags: ["isVeteran"], icon: "fas fa-flag-usa",
+    render: () => `
+      <div class="av-module">
+        <span class="av-label">Status</span>
+        <div class="av-big-text" style="color:#007bff;">Open</div>
+        <p>Walk-ins welcome.</p>
+      </div>
+    `
+  },
+  {
+    id: "dmv", cat: "Identity & Documents", name: "Project ID", desc: "Document Recovery",
+    tags: ["noID"], icon: "fas fa-id-card",
+    render: () => `
+      <div class="av-module">
+        <h3>ID Vouchers</h3>
+        <div class="av-big-text">Active</div>
+      </div>
+    `
+  }
+];
 
-    // --- Workbooks render ---
-    function renderWorkbooks() {
-      const aList = document.getElementById('academy-list'); if (!aList) return;
-      aList.innerHTML = "";
-      workbooks.forEach(w => {
-        const match = w.tags.length === 0 || w.tags.some(t => userProfile[t]);
-        if (match) {
-          aList.innerHTML += `
-            <div class="card recommended" onclick="openLesson('${w.title}', '${w.intel}', ${JSON.stringify(w.steps)})">
-              <div class="rec-badge">GUIDE</div>
-              <div class="card-title">${w.title}</div>
-              <div class="card-desc">${w.desc}</div>
-            </div>
-          `;
-        }
-      });
-    }
+const workbooks = [
+  { id: "pet", title: "K9 Safety", desc: "Toxic Foods", tags: ["hasPet"], intel: "No grapes or xylitol.", steps: ["Check food labels.", "Avoid certain snacks."] },
+  { id: "legal", title: "Warrants", desc: "Quashing Tickets", tags: ["hasLegalIssues"], intel: "Don't ignore fines.", steps: ["Call Court Clerk.", "Request a hearing."] }
+];
 
-    // --- Lesson viewer ---
-    function openLesson(title, intel, steps) {
-      const stepsHtml = Array.isArray(steps) ? `<ol>${steps.map(s => `<li>${s}</li>`).join('')}</ol>` : "";
-      document.getElementById('view-title').innerText = title;
-      document.getElementById('viewer-body').innerHTML = `
-        <div class="intel-box">${intel}</div>
-        ${stepsHtml}
-      `;
-      document.getElementById('lesson-viewer').style.display = 'flex';
-    }
+// --- App entry (no login) ---
+function enterApp(mode) {
+  document.getElementById('main-app').style.display = 'flex';
+  const nav = document.getElementById('nav-bar');
+  hideAllOverlays();
 
-    // --- Chat ---
-    function handleEnterChat(e) { if (e.key === "Enter") sendChatMessage(); }
-    function sendChatMessage() {
-      var input = document.getElementById("user-input");
-      var text = input.value.trim();
-      if (!text) return;
-      document.getElementById('chat-container').innerHTML += `
-        <div class="message user-message">${text}</div>
-      `;
-      input.value = "";
-
-      var lc = text.toLowerCase();
-      var resp = "I am ready. Tell me what you need.";
-
-      if (lc.includes("dog") || lc.includes("pet")) {
-        lastContext = "pet";
-        userProfile.hasPet = true;
-        resp = "I hear you. Let's tackle this. I've highlighted The Shade Tree in your Agencies tab.";
-        renderAgencies();
-        renderWorkbooks();
-      } else if (lc.includes("suicide")) {
-        resp = "Please call 988. I want you to be safe.";
-      } else if (lc.includes("veteran") || lc.includes("military")) {
-        userProfile.isVeteran = true;
-        resp = "Thank you. I've highlighted Veterans services in Agencies and Workbooks.";
-        renderAgencies();
-        renderWorkbooks();
-      } else if (lc.includes("warrant") || lc.includes("court")) {
-        userProfile.hasLegalIssues = true;
-        resp = "Understood. Legal Aid resources are highlighted in Agencies and Workbooks.";
-        renderAgencies();
-        renderWorkbooks();
-      } else if (lc.includes("id") || lc.includes("identification")) {
-        userProfile.noID = true;
-        resp = "Let's work on ID recovery. Project ID is highlighted in Agencies.";
-        renderAgencies();
-      }
-
-      setTimeout(() => {
-        document.getElementById('chat-container').innerHTML += `
-          <div class="message bot-message">${resp}</div>
-        `;
-        const cc = document.getElementById('chat-container');
-        cc.scrollTop = cc.scrollHeight;
-      }, 600);
-    }
-
-    // --- Map ---
-    const locations = [
-      { name: "Catholic Charities", lat: 36.178, lng: -115.140, type: "Soup Kitchen", day: "All" },
-      { name: "The Shade Tree", lat: 36.196, lng: -115.128, type: "Shelter", day: "All" }
-    ];
-    function initMap() {
-      if (map) return;
-      map = L.map('map-frame').setView([36.1699, -115.1398], 11);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-      filterMap("All");
-    }
-    function filterMap(day) {
-      if (!map) return;
-      // Clear existing layers by recreating map (simple approach for demo)
-      map.eachLayer(layer => { if (layer instanceof L.Marker) map.removeLayer(layer); });
-      const dir = document.getElementById('directory-list'); dir.innerHTML = "";
-      locations.filter(l => day === "All" || l.day === day).forEach(loc => {
-        L.marker([loc.lat, loc.lng]).addTo(map).bindPopup(loc.name);
-        dir.innerHTML += `
-          <div class="dir-item"><div class="dir-icon" style="background:#ffc107;"><i class="fas fa-map-pin"></i></div><div><b>${loc.name}</b><br><span style="font-size:0.8rem; color:#666;">${loc.type}</span></div></div>
-        `;
-      });
-      document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active'));
-      const btns = document.querySelectorAll('.day-btn');
-      btns.forEach(b => {
-        if (b.textContent.trim() === day) b.classList.add('active');
-        if (day === "All" && b.textContent.trim() === "All") b.classList.add('active');
-      });
-    }
-
-    // --- Tabs ---
-    function switchTab(tabId) {
-      document.querySelectorAll('.screen').forEach(screen => {
-        screen.classList.remove('active');
-      });
-      document.querySelectorAll('.nav-item').forEach(item => {
-        item.classList.remove('active');
-      });
-      const target = document.getElementById(tabId + '-screen');
-      if (target) target.classList.add('active');
-      const navItem = document.querySelector(`.nav-item[data-tab="${tabId}"]`);
-      if (navItem) navItem.classList.add('active');
-      if (tabId === 'map') setTimeout(initMap, 200);
-    }
-
-    // --- Art Studio ---
-    let currentTool = 'pencil';
-    function openStudio() { document.getElementById('art-studio').style.display='flex'; }
-    function closeStudio() { document.getElementById('art-studio').style.display='none'; }
-    function setTool(t) {
-      currentTool = t;
-      document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
-      const mapBtn = { pencil: 0, eraser: 1, line: 2 }[t];
-      const btns = document.querySelectorAll('.tool-btn'); if (btns[mapBtn]) btns[mapBtn].classList.add('active');
-    }
-
-    // Initial render so Agencies tab isn’t empty before login (optional)
+  if (mode === 'agent') {
+    document.getElementById('page-title').innerText = "Agent Portal";
+    nav.innerHTML = `
+      <button class="nav-item active" data-tab="agent" onclick="switchTab('agent')"><i class="fas fa-shield-alt"></i> Agent</button>
+    `;
+    switchTab('agent');
+  } else {
+    document.getElementById('page-title').innerText = "Yellow Brick Road";
+    nav.innerHTML = `
+      <button class="nav-item active" data-tab="chat" onclick="switchTab('chat')"><i class="fas fa-comments"></i> Brick</button>
+      <button class="nav-item" data-tab="map" onclick="switchTab('map')"><i class="fas fa-map-marked-alt"></i> Map</button>
+      <button class="nav-item" data-tab="portal" onclick="switchTab('portal')"><i class="fas fa-columns"></i> Portal</button>
+      <button class="nav-item" data-tab="agencies" onclick="switchTab('agencies')"><i class="fas fa-building"></i> Agencies</button>
+      <button class="nav-item" data-tab="workbooks" onclick="switchTab('workbooks')"><i class="fas fa-graduation-cap"></i> Workbooks</button>
+      <button class="nav-item" data-tab="vault" onclick="switchTab('wallet')"><i class="fas fa-wallet"></i> Vault</button>
+    `;
+    switchTab('chat');
     renderAgencies();
-  </script>
+    renderWorkbooks();
+  }
+}
+
+// --- Utilities / overlays ---
+function hideAllOverlays() {
+  document.getElementById('agency-viewer').style.display = 'none';
+  document.getElementById('lesson-viewer').style.display = 'none';
+  const studio = document.getElementById('art-studio');
+  if (studio) studio.style.display = 'none';
+}
+
+// --- Agent controls ---
+function updateBeds(change) {
+  bedCount += change; if (bedCount < 0) bedCount = 0;
+  const agentDisplay = document.getElementById('bed-count-display');
+  const portalDisplay = document.getElementById('portal-bed-count');
+  if (agentDisplay) agentDisplay.innerText = bedCount;
+  if (portalDisplay) portalDisplay.innerText = bedCount;
+}
+
+// --- Agency viewer ---
+function openAgency(id) {
+  const agency = agencies.find(a => a.id === id);
+  if (!agency) return;
+  document.getElementById('av-title').innerText = agency.name;
+  document.getElementById('av-body').innerHTML = agency.render();
+  document.getElementById('agency-viewer').style.display = 'flex';
+}
+function closeAgency() { document.getElementById('agency-viewer').style.display = 'none'; }
+
+// --- Agencies list render ---
+function renderAgencies() {
+  const list = document.getElementById('agency-list'); if (!list) return;
+  list.innerHTML = "";
+
+  const categories = ["Welfare & Benefits", "Housing & Shelter", "Legal & Courts", "Veterans Services", "Identity & Documents"];
+  categories.forEach(cat => {
+    const catAgencies = agencies.filter(a => a.cat === cat);
+    if (catAgencies.length > 0) {
+      list.innerHTML += `
+        <div class="category-header">${cat}</div>
+      `;
+      catAgencies.forEach(a => {
+        list.innerHTML += `
+          <div class="card recommended" onclick="openAgency('${a.id}')">
+            <div class="rec-badge">OPEN</div>
+            <div class="card-icon"><i class="${a.icon}"></i></div>
+            <div class="card-content">
+              <div class="card-title">${a.name}</div>
+              <div class="card-desc">${a.desc}</div>
+            </div>
+          </div>
+        `;
+      });
+    }
+  });
+}
+
+// --- Workbooks render ---
+function renderWorkbooks() {
+  const aList = document.getElementById('academy-list'); if (!aList) return;
+  aList.innerHTML = "";
+  workbooks.forEach(w => {
+    const match = w.tags.length === 0 || w.tags.some(t => userProfile[t]);
+    if (match) {
+      aList.innerHTML += `
+        <div class="card recommended" onclick="openLesson('${w.title}', '${w.intel}', ${JSON.stringify(w.steps)})">
+          <div class="rec-badge">GUIDE</div>
+          <div class="card-title">${w.title}</div>
+          <div class="card-desc">${w.desc}</div>
+        </div>
+      `;
+    }
+  });
+}
+
+// --- Lesson viewer ---
+function openLesson(title, intel, steps) {
+  const stepsHtml = Array.isArray(steps) ? `<ol>${steps.map(s => `<li>${s}</li>`).join("")}</ol>` : "";
+  document.getElementById('view-title').innerText = title;
+  document.getElementById('viewer-body').innerHTML = `
+    <div class="intel-box">${intel}</div>
+    ${stepsHtml}
+  `;
+  document.getElementById('lesson-viewer').style.display = 'flex';
+}
+
+// --- Chat ---
+function handleEnterChat(e) { if (e.key === "Enter") sendChatMessage(); }
+function sendChatMessage() {
+  var input = document.getElementById("user-input");
+  var text = input.value.trim();
+  if (!text) return;
+  document.getElementById('chat-container').innerHTML += `
+    <div class="message user-message">${text}</div>
+  `;
+  input.value = "";
+
+  var lc = text.toLowerCase();
+  var resp = "I am ready. Tell me what you need.";
+
+  if (lc.includes("dog") || lc.includes("pet")) {
+    lastContext = "pet";
+    userProfile.hasPet = true;
+    resp = "I hear you. Let's tackle this. I've highlighted The Shade Tree in your Agencies tab.";
+    renderAgencies();
+    renderWorkbooks();
+  } else if (lc.includes("suicide")) {
+    resp = "Please call 988. I want you to be safe.";
+  } else if (lc.includes("veteran") || lc.includes("military")) {
+    userProfile.isVeteran = true;
+    resp = "Thank you. I've highlighted Veterans services in Agencies and Workbooks.";
+    renderAgencies();
+    renderWorkbooks();
+  } else if (lc.includes("warrant") || lc.includes("court")) {
+    userProfile.hasLegalIssues = true;
+    resp = "Understood. Legal Aid resources are highlighted in Agencies and Workbooks.";
+    renderAgencies();
+    renderWorkbooks();
+  } else if (lc.includes("id") || lc.includes("identification")) {
+    userProfile.noID = true;
+    resp = "Let's work on ID recovery. Project ID is highlighted in Agencies.";
+    renderAgencies();
+  }
+
+  setTimeout(() => {
+    document.getElementById('chat-container').innerHTML += `
+      <div class="message bot-message">${resp}</div>
+    `;
+    const cc = document.getElementById('chat-container');
+    cc.scrollTop = cc.scrollHeight;
+  }, 600);
+}
+
+// --- Map ---
+const locations = [
+  { name: "Catholic Charities", lat: 36.178, lng: -115.140, type: "Soup Kitchen", day: "All" },
+  { name: "The Shade Tree", lat: 36.196, lng: -115.128, type: "Shelter", day: "All" }
+];
+function initMap() {
+  if (map) return;
+  map = L.map('map-frame').setView([36.1699, -115.1398], 11);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+  filterMap("All");
+}
+function filterMap(day) {
+  if (!map) return;
+  // Remove markers
+  map.eachLayer(layer => { if (layer instanceof L.Marker) map.removeLayer(layer); });
+  const dir = document.getElementById('directory-list'); dir.innerHTML = "";
+  locations.filter(l => day === "All" || l.day === day).forEach(loc => {
+    L.marker([loc.lat, loc.lng]).addTo(map).bindPopup(loc.name);
+    dir.innerHTML += `
+      <div class="dir-item">
+        <div class="dir-icon" style="background:#ffc107;"><i class="fas fa-map-pin"></i></div>
+        <div><b>${loc.name}</b><br><span style="font-size:0.8rem; color:#666;">${loc.type}</span></div>
+      </div>
+    `;
+  });
+  document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.day-btn').forEach(b => {
+    if (b.textContent.trim() === day) b.classList.add('active');
+  });
+}
+
+// --- Tabs ---
+function switchTab(tabId) {
+  document.querySelectorAll('.screen').forEach(screen => {
+    screen.classList.remove('active');
+  });
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.classList.remove('active');
+  });
+  const target = document.getElementById(tabId + '-screen');
+  if (target) target.classList.add('active');
+  const navItem = document.querySelector(`.nav-item[data-tab="${tabId}"]`);
+  if (navItem) navItem.classList.add('active');
+  if (tabId === 'map') setTimeout(initMap, 200);
+}
+
+// --- Art Studio ---
+let currentTool = 'pencil';
+function openStudio() { document.getElementById('art-studio').style.display='flex'; }
+function closeStudio() { document.getElementById('art-studio').style.display='none'; }
+function setTool(t) {
+  currentTool = t;
+  document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+  const mapBtn = { pencil: 0, eraser: 1, line: 2 }[t];
+  const btns = document.querySelectorAll('.tool-btn'); if (btns[mapBtn])
+    btns[mapBtn].classList.add('active');
+}
+
+// Auto-enter app on load (no login)
+window.onload = () => {
+  enterApp("member"); // or "agent" if you want to default to agent portal
+  // Optional: pre-render agencies/guides for initial view
+  renderAgencies();
+  renderWorkbooks();
+};
+</script>
 </body>
 </html>
