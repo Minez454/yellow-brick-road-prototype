@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <title>Yellow Brick Road</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css
+https://unpkg.com/leaflet@1.9.4/dist/leaflet.css
+https://unpkg.com/leaflet@1.9.4/dist/leaflet.js</script>
 
 <style>
 :root {
@@ -234,7 +234,7 @@ border-radius: 8px; font-weight: bold; margin-top: 10px; color: var(--text-dark)
 </head>
 <body>
 
-<div id="main-app" style="height:100%; flex-direction:column;">
+<div id="main-app" style="height:100%; display:flex; flex-direction:column;">
   <div class="header">
     <h1 id="page-title">Yellow Brick Road</h1>
     <div class="status-badge" onclick="location.reload()"><span class="live-dot"></span>Live Network</div>
@@ -561,31 +561,20 @@ const workbooks = [
 
 // This is the new food-specific location array for the map tab
 const foodResources = [
-  // Catholic Charities (Daily Meals) - Open Daily
   { name: "Catholic Charities (Meals)", lat: 36.1732, lng: -115.1385, type: "Soup Kitchen/Daily Meal", icon: "fas fa-utensils",
     schedule: { day: "All", hours: "10:00 AM - 1:00 PM", notes: "Open every day. ID not required for food." } },
-  
-  // Las Vegas Rescue Mission (Meals) - Daily
   { name: "LV Rescue Mission (Meals)", lat: 36.1710, lng: -115.1430, type: "Daily Meal Service", icon: "fas fa-utensils",
     schedule: { day: "All", hours: "Lunch: 12:00 PM, Dinner: 5:00 PM", notes: "ID not required. Located near Downtown." } },
-
-  // Three Square Food Bank Agency (Pantry Example) - Weekdays
   { name: "Three Square Partner Pantry A", lat: 36.1550, lng: -115.1400, type: "Food Pantry (By Appt)", icon: "fas fa-box-open",
     schedule: { day: "Mon", hours: "9:00 AM - 12:00 PM", notes: "Appointment required. Bring ID and proof of address." } },
   { name: "Three Square Partner Pantry B", lat: 36.1600, lng: -115.1550, type: "Food Pantry (Walk-in)", icon: "fas fa-box-open",
     schedule: { day: "Tue", hours: "1:00 PM - 4:00 PM", notes: "Walk-in. Must be a Southern Nevada resident." } },
   { name: "Three Square Partner Pantry C", lat: 36.1800, lng: -115.1500, type: "Food Pantry (Walk-in)", icon: "fas fa-box-open",
     schedule: { day: "Wed", hours: "9:00 AM - 1:00 PM", notes: "Walk-in. Bring a bag." } },
-    
-  // Shade Tree (Women/Children only) - Daily
   { name: "The Shade Tree (Residents/Clients)", lat: 36.1960, lng: -115.1280, type: "Shelter Food Service", icon: "fas fa-paw",
     schedule: { day: "All", hours: "3 Meals Daily", notes: "For clients of the shelter and their children." } },
-    
-  // Monday Meal (Specific Service Example)
   { name: "Monday Night Hot Meal", lat: 36.1750, lng: -115.1410, type: "Hot Meal Service", icon: "fas fa-fire",
     schedule: { day: "Mon", hours: "6:00 PM - 7:00 PM", notes: "Outdoor service. No requirements." } },
-
-  // Weekend Service Example
   { name: "Weekend Pantry", lat: 36.1500, lng: -115.1300, type: "Food Pantry", icon: "fas fa-box-open",
     schedule: { day: "Sat", hours: "10:00 AM - 1:00 PM", notes: "Walk-in service. Open to all." } },
   { name: "Sunday Soup Kitchen", lat: 36.1620, lng: -115.1350, type: "Soup Kitchen", icon: "fas fa-utensils",
@@ -669,7 +658,6 @@ function renderAgencies() {
   const list = document.getElementById('agency-list'); if (!list) return;
   list.innerHTML = "";
 
-  // The final, comprehensive list of categories for the display filter
   const categories = [
     "Info & Benefits", "Housing & Shelter", "Outreach & Specialty",
     "Legal & Documents", "Job & Career Services", "Health & Mental Health",
@@ -679,16 +667,15 @@ function renderAgencies() {
   categories.forEach(cat => {
     const catAgencies = agencies.filter(a => a.cat === cat);
     if (catAgencies.length > 0) {
-      list.innerHTML += `
+      list.insertAdjacentHTML('beforeend', `
 <div class="category-header">${cat}</div>
-`;
+`);
       catAgencies.forEach(a => {
-        // Simple logic for demonstrating 'recommended' based on user profile or importance
         const isRecommended = a.tags.includes("all") || a.tags.some(t => userProfile[t]);
         const recClass = isRecommended ? 'recommended' : '';
         const recBadge = isRecommended ? '<div class="rec-badge">RECOMMENDED</div>' : '';
 
-        list.innerHTML += `
+        list.insertAdjacentHTML('beforeend', `
 <div class="card ${recClass}" onclick="openAgency('${a.id}')">
   ${recBadge}
   <div class="card-icon"><i class="${a.icon}"></i></div>
@@ -697,26 +684,29 @@ function renderAgencies() {
     <div class="card-desc">${a.desc}</div>
   </div>
 </div>
-`;
+`);
       });
     }
   });
 }
 
-// --- Workbooks render ---
+// --- Workbooks render (safe encoding to avoid quote breaks) ---
 function renderWorkbooks() {
   const aList = document.getElementById('academy-list'); if (!aList) return;
   aList.innerHTML = "";
   workbooks.forEach(w => {
     const match = w.tags.length === 0 || w.tags.some(t => userProfile[t]);
     if (match) {
-      aList.innerHTML += `
-<div class="card recommended" onclick="openLesson('${w.title}', '${w.intel}', ${JSON.stringify(w.steps)})">
+      const safeTitle = encodeURIComponent(w.title);
+      const safeIntel = encodeURIComponent(w.intel);
+      const safeSteps = JSON.stringify(w.steps);
+      aList.insertAdjacentHTML('beforeend', `
+<div class="card recommended" onclick="openLesson(decodeURIComponent('${safeTitle}'), decodeURIComponent('${safeIntel}'), ${safeSteps})">
   <div class="rec-badge">GUIDE</div>
   <div class="card-title">${w.title}</div>
   <div class="card-desc">${w.desc}</div>
 </div>
-`;
+`);
     }
   });
 }
@@ -738,9 +728,9 @@ function sendChatMessage() {
   var input = document.getElementById("user-input");
   var text = input.value.trim();
   if (!text) return;
-  document.getElementById('chat-container').innerHTML += `
+  document.getElementById('chat-container').insertAdjacentHTML('beforeend', `
 <div class="message user-message">${text}</div>
-`;
+`);
   input.value = "";
 
   var lc = text.toLowerCase();
@@ -749,7 +739,6 @@ function sendChatMessage() {
 
   // --- CRITICAL CONTEXTUAL FIX: Check if asking about the last suggested item ---
   if ((lc.includes("whats that") || lc.includes("what is it") || lc.includes("tell me more") || lc === "i'm" || lc === "im" || lc.length < 5) && (lastContext === "shade" || lastContext === "pet")) {
-      // Priority 1: Respond to vague follow-ups if context is active
       resp = "The Shade Tree is a 24-hour safe shelter for women, children, and their pets right here in Las Vegas. They currently have <b>" + bedCount + " kennel spots</b> open. Check the Agencies tab for more details.";
       lastContext = "shade"; // Keep context active
   } else {
@@ -819,9 +808,9 @@ function sendChatMessage() {
 
 
   setTimeout(() => {
-    document.getElementById('chat-container').innerHTML += `
+    document.getElementById('chat-container').insertAdjacentHTML('beforeend', `
 <div class="message bot-message">${resp}</div>
-`;
+`);
     const cc = document.getElementById('chat-container');
     cc.scrollTop = cc.scrollHeight;
   }, 600);
@@ -846,7 +835,7 @@ function renderMapControls(activeDay) {
   controls.innerHTML = '';
   days.forEach(day => {
     const activeClass = (day === activeDay) ? ' active' : '';
-    controls.innerHTML += `<button class="day-btn${activeClass}" onclick="filterMap('${day}')">${day}</button>`;
+    controls.insertAdjacentHTML('beforeend', `<button class="day-btn${activeClass}" onclick="filterMap('${day}')">${day}</button>`);
   });
 }
 
@@ -868,7 +857,7 @@ function filterMap(day) {
     L.marker([loc.lat, loc.lng]).addTo(map).bindPopup(loc.name + '<br>' + loc.schedule.hours);
     
     // Add to Directory List
-    dir.innerHTML += `
+    dir.insertAdjacentHTML('beforeend', `
 <div class="dir-item">
   <div class="dir-icon" style="background:#00c853;"><i class="${loc.icon}"></i></div>
   <div>
@@ -878,7 +867,7 @@ function filterMap(day) {
     <span style="font-size:0.75rem; color:#886;">Needs: ${loc.schedule.notes}</span>
   </div>
 </div>
-`;
+`);
   });
 
   // 3. Update the day buttons to show the active tab
@@ -923,3 +912,4 @@ window.onload = () => {
 </script>
 </body>
 </html>
+ 
