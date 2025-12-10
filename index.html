@@ -600,18 +600,13 @@ function sendChatMessage() {
   var resp = "";
   var contextSwitched = false;
 
-  // --- NEW CONTEXTUAL CHECK: Check if asking about the last suggested item ---
-  if (lc.includes("whats that") || lc.includes("what is it") || lc.includes("tell me more")) {
-      if (lastContext === "shade" || lastContext === "pet") {
-        // Assume user is asking about the last suggested item, The Shade Tree
-        resp = "The Shade Tree is a 24-hour safe shelter for women, children, and their pets right here in Las Vegas. They currently have <b>" + bedCount + " kennel spots</b> open. Check the Agencies tab for more details.";
-        lastContext = "shade"; // Keep context active
-      }
-  }
-  
-  // --- 1. KEYWORD RESPONSES (Prioritized) ---
-  // Only run if the contextual check above didn't find a response, OR if the response should override context (like direct keyword mentions)
-  if (!resp || lc.includes("shade tree") || lc.includes("pet") || lc.includes("legal")) {
+  // --- CRITICAL CONTEXTUAL FIX: Check if asking about the last suggested item ---
+  if ((lc.includes("whats that") || lc.includes("what is it") || lc.includes("tell me more") || lc === "i'm" || lc === "im") && (lastContext === "shade" || lastContext === "pet")) {
+      // Priority 1: Respond to vague follow-ups if context is active
+      resp = "The Shade Tree is a 24-hour safe shelter for women, children, and their pets right here in Las Vegas. They currently have <b>" + bedCount + " kennel spots</b> open. Check the Agencies tab for more details.";
+      lastContext = "shade"; // Keep context active
+  } else {
+    // Priority 2: Run through all keywords
     if (lc.includes("channel") || lc.includes("tunnel") || lc.includes("shine a light")) {
         resp = "Shine A Light specializes in outreach to the underground flood channels and offers immediate placement (IPATH) into housing and treatment.";
     } else if (lc.includes("courtyard") || lc.includes("hrc")) {
@@ -669,7 +664,7 @@ function sendChatMessage() {
 
     // --- 3. FALLBACK RESPONSE ---
     } else if (!resp) {
-      // Final, comprehensive fallback
+      // If no response was found by direct context or keywords, then use the generic fallback
       resp = "I can help with that, but I'm still learning. To get you the best help right now, try keywords like: **shelter**, **pet**, **legal**, **ID**, **job**, **health**, or **youth**.";
       lastContext = ""; // Clear context on unknown input
     }
