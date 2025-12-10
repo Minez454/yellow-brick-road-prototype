@@ -224,7 +224,154 @@ border-radius: 8px; font-weight: bold; margin-top: 10px; color: var(--text-dark)
   background: rgba(0,0,0,0.2); z-index: 350; flex-direction: column; }
 .studio-header { background: #fff; padding: 10px 15px; display:flex; justify-content:
   space-between; align-items:center; border-bottom: 1px solid #eee; }
-#canvas-wrapper"><canvas id="drawing-canvas" width="800" height="600"></canvas></div>
+/* FIX: Corrected closing tag placement for the canvas wrapper */
+#canvas-wrapper { flex:1; background:#fff; } 
+.studio-toolbar { background:#fff; padding: 10px; border-top:1px solid #eee; }
+.tool-row { display:flex; gap:8px; }
+.tool-btn { padding:6px 10px; border: 1px solid #ccc; background:#f7f7f7; border-radius:6px; }
+.tool-btn.active { border-color:#ffc107; }
+</style>
+</head>
+<body>
+
+<div id="main-app" style="height:100%; flex-direction:column;">
+  <div class="header">
+    <h1 id="page-title">Yellow Brick Road</h1>
+    <div class="status-badge" onclick="location.reload()"><span class="live-dot"></span>Live Network</div>
+  </div>
+
+  <div id="chat-screen" class="screen active">
+    <div id="chat-container">
+      <div class="message bot-message">Hello. I am Brick. Think of me as a partner on your journey home. Tell me what's going on, and we will handle it together.</div>
+    </div>
+    <div class="input-area">
+      <input type="text" id="user-input" placeholder="Type here..." onkeydown="handleEnterChat(event)">
+      <button class="send-btn" onclick="sendChatMessage()">Send</button>
+    </div>
+  </div>
+
+  <div id="map-screen" class="screen">
+    <div id="map-controls">
+      </div>
+    <div id="map-frame"></div>
+    <div id="directory-list"></div>
+  </div>
+
+  <div id="portal-screen" class="screen">
+    <div class="content-pad">
+      <div style="margin-bottom:20px;">
+        <div style="font-size:1.5rem; font-weight:900; color:var(--text-dark);">Good Morning, Nitra</div>
+        <div style="color:#886; font-size:0.9rem;">Today's Overview</div>
+      </div>
+      <div class="card" style="background:#f0fff4; border-left-color:var(--emerald);" onclick="openAgency('shade')">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <div class="card-title" style="margin:0;">The Shade Tree</div>
+            <div class="card-desc">Live Status</div>
+          </div>
+          <div style="text-align:right;">
+            <span style="font-size:1.5rem; font-weight:bold; color:var(--emerald);" id="portal-bed-count">3</span>
+            <div style="font-size:0.7rem; font-weight:bold; color:var(--emerald);">KENNELS OPEN</div>
+          </div>
+        </div>
+      </div>
+      <div style="font-size:0.8rem; color:#886; font-weight:800; margin-bottom:10px; text-transform:uppercase;">My Active Statuses</div>
+      <div class="card">
+        <div class="card-content">
+          <b>SNAP (Welfare)</b><br><span style="font-size:0.8rem; color:#666;">Application Pending</span>
+        </div>
+        <div style="font-weight:bold; color:#f0ad4e;">Under Review</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="agencies-screen" class="screen">
+    <div class="content-pad">
+      <div id="agency-list"></div>
+    </div>
+  </div>
+
+  <div id="workbooks-screen" class="screen">
+    <div class="content-pad">
+      <div id="flashcard-container" class="flashcard-box">
+        <div style="font-size:0.8rem; opacity:0.8;">ASSESSMENT</div>
+        <div style="font-size:1.1rem; font-weight:bold; margin:15px 0;" id="fc-text">Do you have a pet?</div>
+        <div>
+          <button class="fc-btn" onclick="answerFlashcard('yes')">Yes</button>
+          <button class="fc-btn" onclick="answerFlashcard('no')">No</button>
+        </div>
+      </div>
+      <div style="font-size:0.8rem; color:#999; font-weight:bold; margin-bottom:10px;">RECOMMENDED GUIDES</div>
+      <div id="academy-list"></div>
+    </div>
+  </div>
+
+  <div id="wallet-screen" class="screen">
+    <div class="content-pad">
+      <div class="vault-section">
+        <div class="vault-header"><span><i class="fas fa-wallet"></i> My Wallet</span> <i class="fas fa-lock" style="color:var(--emerald);"></i></div>
+        <div class="wallet-item">
+          <div style="display:flex; align-items:center;">
+            <i class="fas fa-id-card wallet-icon" style="font-size:1.5rem; margin-right:15px; color:#555;"></i>
+            <div><b>State ID</b><br><span style="font-size:0.7rem; color:#666;">Nevada</span></div>
+          </div>
+          <span class="wallet-badge">VERIFIED</span>
+        </div>
+      </div>
+      <div class="vault-section">
+        <div class="vault-header"><span><i class="fas fa-folder-open"></i> Paperwork</span></div>
+        <div class="wallet-item" style="border-left:none;">
+          <div style="display:flex; align-items:center;">
+            <i class="fas fa-file-pdf wallet-icon" style="font-size:1.5rem; margin-right:15px; color:#fbc02d;"></i>
+            <b>Housing_App.pdf</b>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="agent-screen" class="screen">
+    <div class="content-pad">
+      <div style="text-align:center; margin-bottom:20px;">
+        <h2 style="margin:0;">The Shade Tree</h2>
+        <span style="color:#00c853; font-weight:bold;">System Online</span>
+      </div>
+      <div class="dashboard-stat">
+        <div style="color:#886; font-size:0.9rem; font-weight:bold;">LIVE KENNEL CAPACITY</div>
+        <div class="stat-num" id="bed-count-display">3</div>
+        <div class="control-row">
+          <button class="ctrl-btn btn-minus" onclick="updateBeds(-1)">-</button>
+          <button class="ctrl-btn btn-plus" onclick="updateBeds(1)">+</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav-bar" id="nav-bar"></div>
+</div>
+
+<div id="agency-viewer" style="display:none;">
+  <div class="av-header">
+    <span class="av-title" id="av-title">Agency Name</span>
+    <button onclick="closeAgency()" style="border:none; background:none; font-size:1.5rem;">&times;</button>
+  </div>
+  <div class="av-content" id="av-body"></div>
+</div>
+
+<div id="lesson-viewer" style="display:none;">
+  <div style="padding: 15px; display:flex; justify-content:space-between; background:#ffc107;">
+    <span id="view-title" style="font-weight:bold;">Guide</span>
+    <button onclick="document.getElementById('lesson-viewer').style.display='none'">X</button>
+  </div>
+  <div class="viewer-content" id="viewer-body"></div>
+</div>
+
+<div id="art-studio" style="display:none;">
+  <div class="studio-header">
+    <span><i class="fas fa-palette"></i> Creative Studio</span>
+    <button onclick="closeStudio()" style="background:red; color:white; border:none; padding:5px 10px;">X</button>
+  </div>
+  <div id="canvas-wrapper"><canvas id="drawing-canvas" width="800" height="600"></canvas></div>
   <div class="studio-toolbar">
     <div class="tool-row">
       <button class="tool-btn active" onclick="setTool('pencil')">Pencil</button>
@@ -601,7 +748,7 @@ function sendChatMessage() {
   var contextSwitched = false;
 
   // --- CRITICAL CONTEXTUAL FIX: Check if asking about the last suggested item ---
-  if ((lc.includes("whats that") || lc.includes("what is it") || lc.includes("tell me more") || lc === "i'm" || lc === "im") && (lastContext === "shade" || lastContext === "pet")) {
+  if ((lc.includes("whats that") || lc.includes("what is it") || lc.includes("tell me more") || lc === "i'm" || lc === "im" || lc.length < 5) && (lastContext === "shade" || lastContext === "pet")) {
       // Priority 1: Respond to vague follow-ups if context is active
       resp = "The Shade Tree is a 24-hour safe shelter for women, children, and their pets right here in Las Vegas. They currently have <b>" + bedCount + " kennel spots</b> open. Check the Agencies tab for more details.";
       lastContext = "shade"; // Keep context active
@@ -663,7 +810,7 @@ function sendChatMessage() {
         resp = "Workbooks contain guides and lessons tailored to your needs, like K9 Safety if you have a pet.";
 
     // --- 3. FALLBACK RESPONSE ---
-    } else if (!resp) {
+    } else {
       // If no response was found by direct context or keywords, then use the generic fallback
       resp = "I can help with that, but I'm still learning. To get you the best help right now, try keywords like: **shelter**, **pet**, **legal**, **ID**, **job**, **health**, or **youth**.";
       lastContext = ""; // Clear context on unknown input
