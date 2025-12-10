@@ -264,7 +264,7 @@ border-radius: 8px; font-weight: bold; margin-top: 10px; color: var(--text-dark)
         <div style="font-size:1.5rem; font-weight:900; color:var(--text-dark);">Good Morning, Nitra</div>
         <div style="color:#886; font-size:0.9rem;">Today's Overview</div>
       </div>
-      <div class="card" style="background:#f0fff4; border-left-color:var(--emerald);">
+      <div class="card" style="background:#f0fff4; border-left-color:var(--emerald);" onclick="openAgency('shade')">
         <div style="display:flex; justify-content:space-between; align-items:center;">
           <div>
             <div class="card-title" style="margin:0;">The Shade Tree</div>
@@ -272,7 +272,7 @@ border-radius: 8px; font-weight: bold; margin-top: 10px; color: var(--text-dark)
           </div>
           <div style="text-align:right;">
             <span style="font-size:1.5rem; font-weight:bold; color:var(--emerald);" id="portal-bed-count">3</span>
-            <div style="font-size:0.7rem; font-weight:bold; color:var(--emerald);">BEDS OPEN</div>
+            <div style="font-size:0.7rem; font-weight:bold; color:var(--emerald);">KENNELS OPEN</div>
           </div>
         </div>
       </div>
@@ -389,65 +389,188 @@ var bedCount = 3;
 var lastContext = "";
 var map;
 
-// --- Data ---
+// --- Data (Maximized Las Vegas Organizations) ---
 const agencies = [
+  // --- INFO & BENEFITS ---
   {
-    id: "snap", cat: "Welfare & Benefits", name: "SNAP (Welfare)", desc: "Food Assistance",
-    tags: ["all"], icon: "fas fa-utensils",
+    id: "211", cat: "Info & Benefits", name: "Nevada 2-1-1", desc: "Resource Navigation and Referral (24/7)",
+    tags: ["all"], icon: "fas fa-phone",
     render: () => `
 <div class="av-module">
-  <h3>Benefit Status</h3>
-  <p>Next Deposit: 5th of Month</p>
+  <h3>Direct Link</h3>
+  <div class="av-big-text" style="color:#007bff;">Call or Text 211</div>
+  <p>Available 24/7 for health and human service programs.</p>
 </div>
 `
   },
   {
-    id: "shade", cat: "Housing & Shelter", name: "The Shade Tree", desc: "Women & Pets",
+    id: "snap", cat: "Info & Benefits", name: "DWSS (SNAP/TANF)", desc: "Nevada Food & Cash Assistance",
+    tags: ["all"], icon: "fas fa-utensils",
+    render: () => `
+<div class="av-module">
+  <h3>Benefit Status</h3>
+  <p>Next Deposit: 5th of Month (Mock Data)</p>
+</div>`
+  },
+  // --- HOUSING & SHELTER ---
+  {
+    id: "courtyard", cat: "Housing & Shelter", name: "The Courtyard HRC", desc: "24/7 Intake & Service Hub (Adults)",
+    tags: ["all"], icon: "fas fa-archway",
+    render: () => `
+<div class="av-module">
+  <h3>Primary Service</h3>
+  <div class="av-big-text" style="color:#007bff;">24/7 Access</div>
+  <p>A central location for shelter, service intake, and basic needs like showers and laundry.</p>
+</div>`
+  },
+  {
+    id: "shade", cat: "Housing & Shelter", name: "The Shade Tree", desc: "Women, Children & Pet Friendly Shelter",
     tags: ["hasPet"], icon: "fas fa-paw",
     render: () => `
 <div class="av-module">
   <span class="av-label">Live Availability</span>
   <div class="av-big-text" style="color:#00c853;">${bedCount} Crates Open</div>
-  <p>We are accepting pets.</p>
-</div>
-`
+  <p>Accepting women, children, and up to 3 pets per family. Located near Downtown Las Vegas. Call 702-385-0072.</p>
+</div>`
   },
   {
-    id: "legal", cat: "Legal & Courts", name: "Legal Aid Center", desc: "Warrant & Court Help",
+    id: "lvnrm", cat: "Housing & Shelter", name: "Las Vegas Rescue Mission", desc: "Emergency Shelter & Meals (Separate for Men/Women)",
+    tags: ["all"], icon: "fas fa-home",
+    render: () => `
+<div class="av-module">
+  <span class="av-label">Capacity</span>
+  <div class="av-big-text" style="color:#ffb300;">Limited Beds (Mock Data)</div>
+  <p>Serves meals daily. Check-in times are strict for overnight shelter. Call 702-382-1766.</p>
+</div>`
+  },
+  {
+    id: "salvation", cat: "Housing & Shelter", name: "The Salvation Army (E. Owens Ave)", desc: "Emergency & Transitional Housing",
+    tags: ["all"], icon: "fas fa-building",
+    render: () => `
+<div class="av-module">
+  <h3>Programs</h3>
+  <p>Provides emergency shelter, transitional housing, and general social services on the Lied Social Services Campus. Call 702-649-8240.</p>
+</div>`
+  },
+  {
+    id: "nevada_hand", cat: "Housing & Shelter", name: "Nevada HAND", desc: "Affordable/Supportive Housing Waitlists",
+    tags: ["all"], icon: "fas fa-city",
+    render: () => `
+<div class="av-module">
+  <h3>Housing Waitlist</h3>
+  <p>Offers low-income housing options across the valley. Requires application process.</p>
+</div>`
+  },
+  // --- OUTREACH & SPECIALTY ---
+  {
+    id: "shinealight", cat: "Outreach & Specialty", name: "Shine A Light", desc: "Flood Channel Outreach, IPATH, and Case Management",
+    tags: ["all"], icon: "fas fa-lightbulb",
+    render: () => `
+<div class="av-module">
+  <h3>Key Service</h3>
+  <div class="av-big-text">Instant Placement (IPATH)</div>
+  <p>Specializes in outreach to individuals living in the underground flood channels, offering immediate placement into treatment and housing.</p>
+</div>`
+  },
+  // --- LEGAL & DOCUMENTS ---
+  {
+    id: "legal", cat: "Legal & Documents", name: "Legal Aid Center of Southern Nevada", desc: "Free Legal Help for Civil Cases",
     tags: ["hasLegalIssues"], icon: "fas fa-gavel",
     render: () => `
 <div class="av-module">
-  <h3>Self-Help Law</h3>
-  <button class="av-btn">File Motion</button>
-</div>
-`
+  <h3>Walk-In Hours</h3>
+  <p>M-F, 9:00am - 12:00pm</p>
+  <button class="av-btn">See Common Forms</button>
+</div>`
   },
   {
-    id: "va", cat: "Veterans Services", name: "Veterans Affairs", desc: "CRRC & Housing",
-    tags: ["isVeteran"], icon: "fas fa-flag-usa",
-    render: () => `
-<div class="av-module">
-  <span class="av-label">Status</span>
-  <div class="av-big-text" style="color:#007bff;">Open</div>
-  <p>Walk-ins welcome.</p>
-</div>
-`
-  },
-  {
-    id: "dmv", cat: "Identity & Documents", name: "Project ID", desc: "Document Recovery",
+    id: "dmv", cat: "Legal & Documents", name: "Catholic Charities (ID Recovery)", desc: "Help Obtaining NV ID/Birth Certificate",
     tags: ["noID"], icon: "fas fa-id-card",
     render: () => `
 <div class="av-module">
   <h3>ID Vouchers</h3>
-  <div class="av-big-text">Active</div>
-</div>
-`
+  <div class="av-big-text">Active (Ask Case Manager)</div>
+</div>`
+  },
+  // --- JOB & CAREER SERVICES ---
+  {
+    id: "help", cat: "Job & Career Services", name: "HELP of Southern Nevada", desc: "Workforce Services, Housing, and Family Support",
+    tags: ["all"], icon: "fas fa-briefcase",
+    render: () => `
+<div class="av-module">
+  <h3>Programs</h3>
+  <p>Comprehensive services including Workforce Development, Adult & Family Housing, and Diaper Bank services. Call 702-369-4357.</p>
+</div>`
+  },
+  // --- HEALTH & MENTAL HEALTH ---
+  {
+    id: "most", cat: "Health & Mental Health", name: "MOST (Mobile Outreach Safety Team)", desc: "Non-Police Mental Health Crisis Intervention",
+    tags: ["all"], icon: "fas fa-head-side-mask",
+    render: () => `
+<div class="av-module">
+  <span class="av-label">Contact</span>
+  <div class="av-big-text">Call 988 or Non-Emergency Line</div>
+  <p>Teams respond to behavioral health crises in the community. **If it is a life-threatening emergency, call 911.**</p>
+</div>`
+  },
+  {
+    id: "huntridge", cat: "Health & Mental Health", name: "Huntridge Family Clinic", desc: "Low-Cost Primary Medical Care",
+    tags: ["all"], icon: "fas fa-hospital-alt",
+    render: () => `
+<div class="av-module">
+  <h3>Walk-Ins</h3>
+  <p>Accepts Medicare, Medicaid, and offers sliding scale fees for uninsured.</p>
+</div>`
+  },
+  // --- VETERANS SERVICES ---
+  {
+    id: "va", cat: "Veterans Services", name: "Veterans Village", desc: "Transitional/Permanent Veteran Housing",
+    tags: ["isVeteran"], icon: "fas fa-flag-usa",
+    render: () => `
+<div class="av-module">
+  <span class="av-label">Next Intake</span>
+  <div class="av-big-text" style="color:#007bff;">Next Week (Mock Data)</div>
+  <p>Comprehensive support for veterans and their families. VA CRRC Las Vegas: 702-791-9077.</p>
+</div>`
+  },
+  // --- YOUTH & FAMILY ---
+  {
+    id: "nphy", cat: "Youth & Family", name: "Nevada Partnership for Homeless Youth (NPHY)", desc: "Drop-In Center, Shelter, and Housing for Youth",
+    tags: ["all"], icon: "fas fa-running",
+    render: () => `
+<div class="av-module">
+  <h3>Ages Served</h3>
+  <div class="av-big-text">Youth 12-24</div>
+  <p>Crisis Hotline: 1-866-U-ARE-SAFE (1-866-827-3723). Offers shelter, food, ID help, and more.</p>
+</div>`
+  },
+  {
+    id: "st_jude", cat: "Youth & Family", name: "St. Jude's Ranch for Children", desc: "Trauma-Informed Residential Care for Youth",
+    tags: ["all"], icon: "fas fa-child",
+    render: () => `
+<div class="av-module">
+  <h3>Focus</h3>
+  <p>Residential services for abused, neglected, or homeless youth aged 6-24.</p>
+</div>`
   }
 ];
 
 const workbooks = [
-  { id: "pet", title: "K9 Safety", desc: "Toxic Foods", tags: ["hasPet"], intel: "No grapes or xylitol.", steps: ["Check food labels.", "Avoid certain snacks."] },
-  { id: "legal", title: "Warrants", desc: "Quashing Tickets", tags: ["hasLegalIssues"], intel: "Don't ignore fines.", steps: ["Call Court Clerk.", "Request a hearing."] }
+  { id: "pet", title: "K9 Safety", desc: "Toxic Foods", tags: ["hasPet"], intel: "No grapes, onions, or xylitol. Keep vaccinations updated.", steps: ["Check food labels.", "Avoid certain snacks."] },
+  { id: "legal", title: "Warrants", desc: "Quashing Tickets", tags: ["hasLegalIssues"], intel: "Don't ignore fines, especially traffic tickets. Legal Aid can help.", steps: ["Call Court Clerk.", "Request a hearing."] }
+];
+
+// --- Map Locations Update ---
+const locations = [
+  { name: "The Courtyard HRC", lat: 36.188, lng: -115.137, type: "24/7 Shelter Hub", day: "All" },
+  { name: "Catholic Charities (Food/ID)", lat: 36.173, lng: -115.138, type: "Food/Documents", day: "All" },
+  { name: "The Shade Tree", lat: 36.196, lng: -115.128, type: "Shelter (Women/Pets)", day: "All" },
+  { name: "Las Vegas Rescue Mission", lat: 36.171, lng: -115.143, type: "Shelter/Food", day: "All" },
+  { name: "The Salvation Army", lat: 36.178, lng: -115.115, type: "Shelter/Services", day: "All" },
+  { name: "HELP of Southern Nevada (Flamingo)", lat: 36.115, lng: -115.125, type: "Workforce/Housing", day: "Mon-Fri" },
+  { name: "Legal Aid Center of SN", lat: 36.168, lng: -115.137, type: "Legal Services", day: "Mon" },
+  { name: "Huntridge Family Clinic", lat: 36.160, lng: -115.127, type: "Medical Clinic", day: "Mon-Fri" },
+  { name: "Veterans Village", lat: 36.165, lng: -115.140, type: "Veteran Housing", day: "All" },
 ];
 
 // --- App entry (no login) ---
@@ -492,6 +615,10 @@ function updateBeds(change) {
   const portalDisplay = document.getElementById('portal-bed-count');
   if (agentDisplay) agentDisplay.innerText = bedCount;
   if (portalDisplay) portalDisplay.innerText = bedCount;
+  const avTitle = document.getElementById('av-title').innerText;
+  if (avTitle === "The Shade Tree" && document.getElementById('agency-viewer').style.display === 'flex') {
+    openAgency('shade');
+  }
 }
 
 // --- Agency viewer ---
@@ -509,7 +636,13 @@ function renderAgencies() {
   const list = document.getElementById('agency-list'); if (!list) return;
   list.innerHTML = "";
 
-  const categories = ["Welfare & Benefits", "Housing & Shelter", "Legal & Courts", "Veterans Services", "Identity & Documents"];
+  // The final, comprehensive list of categories for the display filter
+  const categories = [
+    "Info & Benefits", "Housing & Shelter", "Outreach & Specialty",
+    "Legal & Documents", "Job & Career Services", "Health & Mental Health",
+    "Veterans Services", "Youth & Family"
+  ];
+
   categories.forEach(cat => {
     const catAgencies = agencies.filter(a => a.cat === cat);
     if (catAgencies.length > 0) {
@@ -517,9 +650,14 @@ function renderAgencies() {
 <div class="category-header">${cat}</div>
 `;
       catAgencies.forEach(a => {
+        // Simple logic for demonstrating 'recommended' based on user profile or importance
+        const isRecommended = a.tags.includes("all") || a.tags.some(t => userProfile[t]);
+        const recClass = isRecommended ? 'recommended' : '';
+        const recBadge = isRecommended ? '<div class="rec-badge">RECOMMENDED</div>' : '';
+
         list.innerHTML += `
-<div class="card recommended" onclick="openAgency('${a.id}')">
-  <div class="rec-badge">OPEN</div>
+<div class="card ${recClass}" onclick="openAgency('${a.id}')">
+  ${recBadge}
   <div class="card-icon"><i class="${a.icon}"></i></div>
   <div class="card-content">
     <div class="card-title">${a.name}</div>
@@ -576,35 +714,51 @@ function sendChatMessage() {
   var resp = "";
   var contextSwitched = false;
 
-  // --- 1. KEYWORD RESPONSES ---
-  if (lc.includes("dog") || lc.includes("pet")) {
+  // --- 1. KEYWORD RESPONSES (Prioritized) ---
+  if (lc.includes("channel") || lc.includes("tunnel") || lc.includes("shine a light")) {
+      resp = "Shine A Light specializes in outreach to the underground flood channels and offers immediate placement (IPATH) into housing and treatment.";
+  } else if (lc.includes("courtyard") || lc.includes("hrc")) {
+      resp = "The Courtyard Homeless Resource Center is a 24/7 hub for shelter, basic needs, and intake for other services for adults.";
+  } else if (lc.includes("youth") || lc.includes("teen") || lc.includes("young adult") || lc.includes("nphy")) {
+      resp = "Nevada Partnership for Homeless Youth (NPHY) and St. Jude's Ranch are key resources. I've highlighted them under Youth & Family in the Agencies tab.";
+  } else if (lc.includes("health") || lc.includes("sick") || lc.includes("doctor")) {
+      resp = "Low-cost medical care is available. I've highlighted Huntridge Family Clinic in the Health & Mental Health section of Agencies.";
+  } else if (lc.includes("rent") || lc.includes("affordable") || lc.includes("hand")) {
+      resp = "I've highlighted Nevada HAND in the Housing & Shelter section. They manage applications for many affordable housing units.";
+  } else if (lc.includes("211") || lc.includes("navigator")) {
+      resp = "Nevada 2-1-1 is a key resource to find support programs near you. Check the Info & Benefits tab for quick access.";
+  } else if (lc.includes("job") || lc.includes("career") || lc.includes("work") || lc.includes("help of sn")) {
+      resp = "HELP of Southern Nevada provides comprehensive Workforce Services. Check the Agencies tab.";
+  } else if (lc.includes("mental health") || lc.includes("crisis") || lc.includes("most")) {
+      resp = "If it's an emergency, call 988. I've also highlighted the Mobile Outreach Safety Team (MOST) who can provide non-police support.";
+  } else if (lc.includes("shade tree") || lc.includes("shade")) {
+    lastContext = "shade";
+    resp = "The Shade Tree is a 24-hour safe shelter for women, children, and their pets right here in Las Vegas. They currently have <b>" + bedCount + " kennel spots</b> open. Check the Agencies tab for more details.";
+  } else if (lc.includes("dog") || lc.includes("pet")) {
     lastContext = "pet";
     userProfile.hasPet = true;
-    resp = "I hear you. Let's tackle this. I've highlighted The Shade Tree in your Agencies tab.";
+    resp = "I hear you. Let's tackle this. I've highlighted The Shade Tree in your Agencies tab, as they are pet friendly!";
     renderAgencies();
     renderWorkbooks();
-  } else if (lc.includes("suicide")) {
-    resp = "Please call 988. I want you to be safe.";
+  } else if (lc.includes("suicide") || lc.includes("hurt myself") || lc.includes("988")) {
+    resp = "Please call 988 or 911 immediately. I want you to be safe. We can talk after you make that call.";
   } else if (lc.includes("veteran") || lc.includes("military")) {
     lastContext = "veteran";
     userProfile.isVeteran = true;
-    resp = "Thank you. I've highlighted Veterans services in Agencies and Workbooks.";
+    resp = "Thank you for your service. I've highlighted Veterans Village and other services in Agencies and Workbooks.";
     renderAgencies();
     renderWorkbooks();
   } else if (lc.includes("warrant") || lc.includes("court") || lc.includes("legal")) {
     lastContext = "legal";
     userProfile.hasLegalIssues = true;
-    resp = "Understood. Legal Aid resources are highlighted in Agencies and Workbooks.";
+    resp = "Understood. Legal Aid Center of Southern Nevada resources are highlighted in Agencies and Workbooks.";
     renderAgencies();
     renderWorkbooks();
   } else if (lc.includes("id") || lc.includes("identification") || lc.includes("birth certificate")) {
     lastContext = "id";
     userProfile.noID = true;
-    resp = "Let's work on ID recovery. Project ID is highlighted in Agencies.";
+    resp = "Let's work on ID recovery. Catholic Charities and other resources are highlighted in Agencies.";
     renderAgencies();
-  } else if (lc.includes("shade tree") || lc.includes("shade")) {
-    lastContext = "shade";
-    resp = "The Shade Tree is a 24-hour safe shelter for women, children, and their pets right here in Las Vegas. They currently have <b>" + bedCount + " kennel spots</b> open. Check the Agencies tab for more details.";
   
   // --- 2. CONTEXTUAL & GENERAL RESPONSES ---
   } else if (lc.includes("map")) {
@@ -618,8 +772,8 @@ function sendChatMessage() {
 
   // --- 3. FALLBACK RESPONSE ---
   } else {
-    // This is the improved general fallback response
-    resp = "I can help with that, but I'm still learning. To get you the best help right now, try keywords like: <b>pet</b>, <b>legal</b>, <b>ID</b>, or ask about one of the tabs: **Map**, **Agencies**, or **Vault**.";
+    // Final, comprehensive fallback
+    resp = "I can help with that, but I'm still learning. To get you the best help right now, try keywords like: **shelter**, **pet**, **legal**, **ID**, **job**, **health**, or **youth**.";
     lastContext = ""; // Clear context on unknown input
   }
 
@@ -634,13 +788,10 @@ function sendChatMessage() {
 }
 
 // --- Map ---
-const locations = [
-  { name: "Catholic Charities", lat: 36.178, lng: -115.140, type: "Soup Kitchen", day: "All" },
-  { name: "The Shade Tree", lat: 36.196, lng: -115.128, type: "Shelter", day: "All" }
-];
 function initMap() {
   if (map) return;
-  map = L.map('map-frame').setView([36.1699, -115.1398], 11);
+  // Centered on Downtown Las Vegas area
+  map = L.map('map-frame').setView([36.175, -115.145], 13); 
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
   filterMap("All");
 }
@@ -693,7 +844,7 @@ function setTool(t) {
 
 // Auto-enter app on load (no login)
 window.onload = () => {
-  enterApp("member"); // Change to "agent" if you want to default to the agent portal
+  enterApp("member");
   renderAgencies();
   renderWorkbooks();
 };
